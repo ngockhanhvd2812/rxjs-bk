@@ -1,0 +1,3503 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học RxJS Trực Quan - Từ Người Mới Đến Chuyên Gia</title>
+    <script src="https://cdn.tailwindcss.com "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/7.8.1/rxjs.umd.min.js "></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400 ;500;600;700&display=swap" rel="stylesheet">
+    <!-- Highlight.js for code snippets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #4b5563;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f9fafb;
+
+            --bg-main: #f0f4f8;
+            --bg-card: white;
+            --bg-container: white;
+            --bg-interactive: #f8fafc;
+            --bg-gradient-start: #e2e8f0;
+            --bg-gradient-mid: #f0f4f8;
+            --bg-gradient-end: #d6f0ff;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --text-heading: #1e40af;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --input-bg: white;
+            --input-border: #d1d5db;
+            --input-focus-border: #2563eb;
+            --log-bg: #f8fafc;
+            --log-text: #475569;
+            --code-bg: #282c34;
+            --op-box-bg: #f0fff4;
+            --op-box-border: #2ecc71;
+            --op-box-text: #4b5563;
+            --nav-button-bg: #e5e7eb;
+            --nav-button-text: #4b5563;
+            --nav-button-border: #d1d5db;
+            --nav-button-active-bg: #2563eb;
+            --nav-button-active-text: white;
+            --skeleton-bg: rgba(0, 0, 0, 0.08);
+            --skeleton-shimmer: rgba(255, 255, 255, 0.5);
+        }
+
+        body.dark-mode {
+            --bg-main: #111827;
+            --bg-card: #1f2937;
+            --bg-container: #1f2937;
+            --bg-interactive: #374151;
+            --bg-gradient-start: #1a202c;
+            --bg-gradient-mid: #2d3748;
+            --bg-gradient-end: #171923;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --text-heading: #60a5fa;
+            --border-color: #4b5563;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --input-bg: #374151;
+            --input-border: #4b5563;
+            --input-focus-border: #3b82f6;
+            --log-bg: #111827;
+            --log-text: #9ca3af;
+            --code-bg: #0d1117;
+            --op-box-bg: rgba(59, 130, 246, 0.1);
+            --op-box-border: #3b82f6;
+            --op-box-text: #90cdf4;
+            --nav-button-bg: #374151;
+            --nav-button-text: #e5e7eb;
+            --nav-button-border: #4b5563;
+            --nav-button-active-bg: #3b82f6;
+            --nav-button-active-text: white;
+            --skeleton-bg: rgba(255, 255, 255, 0.08);
+            --skeleton-shimmer: rgba(255, 255, 255, 0.1);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(-45deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
+            background-size: 400% 400%;
+            animation: bg-animation 15s ease infinite;
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+             background-color: var(--bg-container);
+             transition: background-color 0.3s ease;
+             box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+        }
+
+        #scroll-progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(to right, #3b82f6, #60a5fa);
+            width: 0%;
+            z-index: 9999;
+            transition: width 0.1s linear;
+        }
+
+        @keyframes bg-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .header-bg {
+            background: linear-gradient(to right, #1e3a8a, #3b82f6);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .marble {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px; 
+            height: 40px;
+            padding: 0 8px; 
+            border-radius: 50%;
+            background-color: #3498db;
+            color: white;
+            margin: 5px;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0.5);
+            font-size: 0.8rem; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: marble-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes marble-appear {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .marble.error { 
+            background-color: #e74c3c; 
+            font-size: 1.2rem;
+            animation: marble-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, 
+                       marble-error-shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+            animation-delay: 0s, 0.5s;
+        }
+
+        @keyframes marble-error-shake {
+            10%, 90% { transform: scale(1) translate3d(-1px, 0, 0); }
+            20%, 80% { transform: scale(1) translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: scale(1) translate3d(-4px, 0, 0); }
+            40%, 60% { transform: scale(1) translate3d(4px, 0, 0); }
+        }
+        
+        .marble.fallback { background-color: #f39c12; }
+
+        .marble.complete { 
+            background-color: #7f8c8d;
+            min-width: 2px;
+            width: 2px;
+            height: 30px;
+            border-radius: 2px;
+            margin-top: 10px;
+            padding: 0;
+            transform: scaleY(0);
+            transform-origin: center;
+            animation: complete-line-draw 0.5s ease-out forwards;
+        }
+
+        @keyframes complete-line-draw {
+            to {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+        }
+        
+        .marble.subject-s1 { background-color: #9b59b6; } 
+        .marble.subject-s2 { background-color: #e67e22; } 
+        .marble.loading { background-color: #f1c40f; color: #333; animation: pulse 1.5s infinite; }
+        .marble.api1 { background-color: #16a085; } 
+        .marble.api2 { background-color: #27ae60; } 
+        
+        .marble-timeline {
+            position: relative;
+            padding: 15px 0;
+            min-height: 70px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .marble-timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #cbd5e1;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        .log-box {
+            background-color: var(--log-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 1rem;
+            min-height: 80px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: var(--log-text);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        .operator-box, .subject-box, .example-box-interactive {
+            min-height: 60px;
+            border: 2px dashed var(--op-box-border);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+            background-color: var(--op-box-bg);
+            color: var(--op-box-text);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .operator-box::before, .subject-box::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: var(--bg-card);
+            padding: 0 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .subject-box { 
+            border-color: #3498db; 
+            background-color: #eaf5ff; 
+        }
+        
+        .example-box-interactive { 
+            border-color: #e67e22; 
+            background-color: #fff8f0; 
+        }
+        body.dark-mode .subject-box { background-color: rgba(52, 152, 219, 0.1); border-color: #3498db; }
+        body.dark-mode .example-box-interactive { background-color: rgba(230, 126, 34, 0.1); border-color: #e67e22;}
+
+        .nav-button {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 500;
+            background-color: var(--nav-button-bg);
+            color: var(--nav-button-text);
+            border: 1px solid var(--nav-button-border);
+            box-shadow: 0 1px 2px var(--shadow-color);
+        }
+        
+        .nav-button:hover {
+            background-color: var(--nav-button-active-bg);
+            color: var(--nav-button-active-text);
+            transform: translateY(-2px);
+        }
+        
+        .nav-button.active {
+            background-color: var(--nav-button-active-bg); 
+            color: var(--nav-button-active-text);
+            border-color: var(--nav-button-active-bg);
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+        }
+        
+        .content-section {
+            display: none; 
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .content-section.active {
+            display: block; 
+        }
+        
+        .btn {
+            background-color: #3b82f6; 
+            color: white;
+            padding: 10px 15px; 
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 8px; 
+            margin-bottom: 8px; 
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+        
+        .btn:hover {
+            background-color: #2563eb; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
+        .btn-secondary { background-color: #6b7280; }
+        .btn-secondary:hover { background-color: #4b5563; }
+        .btn-success { background-color: #22c55e; }
+        .btn-success:hover { background-color: #16a34a; }
+        .btn-warning { background-color: #f59e0b; }
+        .btn-warning:hover { background-color: #d97706; }
+        .btn-danger { background-color: #ef4444; }
+        .btn-danger:hover { background-color: #dc2626; }
+        
+        .input-field {
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            padding: 10px 12px;
+            border-radius: 8px;
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 15px; 
+            font-size: 0.95rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .input-field.is-valid { border-color: #22c55e; }
+        .input-field.is-valid:focus { box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2); }
+        .input-field.is-invalid { border-color: #ef4444; }
+        .input-field.is-invalid:focus { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
+        .validation-message {
+            font-size: 0.8rem;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            min-height: 1.2rem;
+        }
+        .validation-message.is-valid { color: #16a34a; }
+        .validation-message.is-invalid { color: #dc2626; }
+        
+        .input-field-sm {
+            width: auto;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        .draggable {
+            width: 100px; 
+            height: 100px; 
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: white;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            border-radius: 8px; 
+            cursor: grab; 
+            position: absolute; 
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .draggable.dragging { 
+            cursor: grabbing; 
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+            transform: scale(1.05);
+            z-index: 1000;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        #dropZone {
+            width: 100%; 
+            height: 150px; 
+            background-color: var(--bg-interactive); 
+            border: 2px dashed var(--border-color);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            border-radius: 8px; 
+            margin-top: 15px; 
+            color: var(--text-secondary); 
+            font-style: italic;
+            transition: all 0.3s ease;
+        }
+        
+        #dropZone.over { 
+            background-color: #d1e7dd; 
+            border-color: #22c55e; 
+            color: #166534;
+            animation: pulse-glow 1.5s infinite;
+        }
+        body.dark-mode #dropZone.over { background-color: #166534; border-color: #22c55e; color: #d1e7dd; }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        
+        #infiniteScrollContainer {
+            height: 300px; 
+            overflow-y: auto; 
+            border: 1px solid var(--border-color); 
+            padding: 10px; 
+            background-color: var(--bg-main);
+            border-radius: 8px;
+        }
+        
+        #infiniteScrollContainer .item {
+            padding: 12px; 
+            border-bottom: 1px solid var(--border-color); 
+            background-color: var(--bg-card); 
+            margin-bottom: 8px; 
+            border-radius: 6px;
+            box-shadow: 0 1px 3px var(--shadow-color);
+        }
+        
+        #infiniteScrollContainer .loading-more {
+            text-align: center; 
+            padding: 15px; 
+            font-style: italic; 
+            color: var(--text-secondary);
+        }
+        
+        .section-title {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 24px;
+            color: var(--text-heading);
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background-color: #2563eb;
+            border-radius: 50%;
+        }
+        
+        .info-card {
+            background: var(--bg-interactive);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            margin-bottom: 24px;
+            border-left: 4px solid #2563eb;
+            transition: background-color 0.3s ease;
+        }
+        
+        .info-card h3 {
+            margin-top: 0;
+            color: var(--text-heading);
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .analogy-box {
+            background: var(--bg-interactive);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .analogy-title {
+            color: var(--text-heading);
+            margin-bottom: 8px;
+        }
+        
+        .interactive-demo {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .interactive-demo:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px var(--shadow-color);
+        }
+
+        .demo-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .code-block-wrapper {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+        .code-block-wrapper.show {
+            opacity: 1;
+            max-height: 1000px;
+            margin-top: 1rem;
+        }
+        .copy-code-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: #4b5563;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        .copy-code-btn:hover {
+            opacity: 1;
+        }
+        .copy-code-btn.copied {
+            background-color: #22c55e;
+            opacity: 1;
+        }
+        .use-case-box {
+            background-color: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            margin: 1rem 0;
+            border-radius: 4px;
+            text-align: left;
+        }
+        body.dark-mode .use-case-box {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            z-index: 10;
+        }
+        .dark-mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        .dark-mode-toggle .icon {
+            font-size: 22px;
+            transition: transform 0.4s ease;
+        }
+        .dark-mode .dark-mode-toggle .icon-moon { display: none; }
+        .dark-mode-toggle .icon-sun { display: none; }
+        .dark-mode .dark-mode-toggle .icon-sun { display: block; }
+        html:not(.dark-mode) .dark-mode-toggle .icon-moon { display: block; }
+        
+        /* Skeleton Loader */
+        .skeleton {
+            position: relative;
+            overflow: hidden;
+            background-color: var(--skeleton-bg);
+            border-radius: 8px;
+            min-height: 80px; /* Match log box height */
+        }
+        .skeleton::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, var(--skeleton-shimmer), transparent);
+            animation: skeleton-shimmer 1.5s infinite;
+        }
+        @keyframes skeleton-shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        
+        /* Tooltip */
+        .tooltip-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: help;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 240px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 135%;
+            left: 50%;
+            margin-left: -120px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            font-weight: normal;
+            line-height: 1.4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-button {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+                margin-bottom: 8px;
+            }
+            .container { padding: 15px; }
+            .marble { min-width: 35px; height: 35px; font-size: 0.75rem; }
+            .dark-mode-toggle { top: 10px; right: 10px; }
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/"
+  }
+}
+</script>
+</head>
+<body class="p-4 md:p-8">
+    <div id="scroll-progress-bar"></div>
+    <div id="confetti-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10000;"></div>
+
+    <div class="container mx-auto max-w-5xl bg-white p-6 md:p-8 rounded-xl shadow-xl">
+        <header class="mb-8 text-center header-bg py-8 px-4">
+             <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+                <span class="icon icon-moon">🌙</span>
+                <span class="icon icon-sun">☀️</span>
+            </button>
+            <div class="max-w-2xl mx-auto">
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">Học RxJS Trực Quan</h1>
+                <p class="text-lg md:text-xl opacity-90">Từ người mới bắt đầu đến chuyên gia lập trình phản ứng</p>
+                <div class="mt-6">
+                    <div class="inline-flex bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-2 text-sm">
+                        <span class="mr-2">⭐</span> Khóa học trực quan nhất về Reactive Programming
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Search Input -->
+        <div class="mb-8 px-1">
+            <input type="search" id="searchInput" placeholder="🔎 Tìm kiếm operator hoặc ví dụ... (vd: switchMap, form, kéo thả)" class="w-full p-3 text-lg rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-blue-500 transition-all duration-300 shadow-sm hover:shadow-md focus:shadow-lg">
+        </div>
+
+        <nav class="flex flex-wrap justify-center gap-2 mb-8">
+            <button data-section="intro" class="nav-button active">Tổng Quan</button>
+            <button data-section="basic-operators" class="nav-button">Operators Cơ Bản</button>
+            <button data-section="advanced-operators" class="nav-button">Operators Nâng Cao</button>
+            <button data-section="more-advanced-operators" class="nav-button">Operators Kết Hợp</button>
+            <button data-section="utility-operators" class="nav-button">Utility Operators</button>
+            <button data-section="useful-operators" class="nav-button">Operators Hữu Ích</button>
+            <button data-section="subjects" class="nav-button">Subjects</button>
+            <button data-section="real-world" class="nav-button">Ví Dụ Thực Tế</button>
+            <button data-section="hardcore-examples" class="nav-button">Ví Dụ Khó</button>
+            <button data-section="ultra-hardcore-examples" class="nav-button">Ví Dụ Siêu Khó</button>
+            <button data-section="advanced-apps" class="nav-button">Ứng Dụng Nâng Cao</button>
+        </nav>
+
+        <main id="app-content">
+            <!-- Section 1: Introduction -->
+            <section id="intro" class="content-section active">
+                 <h2 class="text-2xl md:text-3xl mb-6 section-title">1. Chào mừng đến với RxJS</h2>
+                 <div class="info-card">
+                    <h3>RxJS là gì?</h3>
+                    <p>RxJS (Reactive Extensions for JavaScript) là một thư viện giúp lập trình với các luồng dữ liệu bất đồng bộ. Hãy tưởng tượng bạn đang xử lý mọi thứ, từ sự kiện click chuột, nhập liệu, đến dữ liệu từ API, như những dòng sông (streams) chảy liên tục. RxJS cung cấp cho bạn các công cụ mạnh mẽ để điều khiển, biến đổi và kết hợp những dòng sông này.</p>
+                </div>
+                <div class="analogy-box">
+                    <p class="analogy-title">💡 Phép so sánh: Dây chuyền sản xuất</p>
+                    <p>Hãy xem một <span class="text-blue-700">Observable</span> như một dây chuyền sản xuất. Nó đưa ra các "sản phẩm thô" (dữ liệu). Các <span class="text-blue-700">Operators</span> (như <code>map</code>, <code>filter</code>) là các cỗ máy trên dây chuyền, mỗi máy thực hiện một công đoạn xử lý. Cuối cùng, <span class="text-blue-700">Observer</span> (người đăng ký) là người nhận "thành phẩm" (dữ liệu đã qua xử lý).</p>
+                </div>
+                <div class="interactive-demo" data-demo-id="firstObservable" data-search-terms="of, observable, cơ bản">
+                    <h3 class="text-lg mb-3">Observable đầu tiên của bạn</h3>
+                    <p class="mb-4">Đây là một Observable đơn giản nhất, sử dụng hàm <code>of</code> để tạo ra một luồng dữ liệu phát ra một vài giá trị rồi kết thúc.</p>
+                    <div class="demo-controls">
+                        <button id="runFirstObservable" class="btn">Chạy of('A', 'B', 'C')</button>
+                        <button id="resetFirstObservable" class="btn btn-secondary btn-sm">Reset</button>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Luồng dữ liệu (Source):</div>
+                    <div id="firstObservableStream" class="marble-timeline"></div>
+                    <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                    <div id="firstObserverOutput" class="log-box"></div>
+                    <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                    <div class="code-block-wrapper">
+                        <div class="relative">
+                            <pre><code class="language-javascript" data-code-id="firstObservable"></code></pre>
+                            <button class="btn btn-sm copy-code-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Basic Operators -->
+            <section id="basic-operators" class="content-section">
+                <h2 class="text-2xl md:text-3xl mb-6 section-title">2. Các Operators Cơ Bản</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Map -->
+                    <div class="interactive-demo" data-demo-id="map" data-search-terms="map, biến đổi">
+                        <h3 class="text-lg mb-3"><code class="text-purple-600">map(fn)</code> - Biến đổi</h3>
+                        <p class="mb-4">Biến đổi mỗi giá trị được phát ra bởi luồng nguồn. Ví dụ: nhân mỗi số với 10.</p>
+                        <div class="demo-controls">
+                            <button id="runMapOperator" class="btn">Chạy Map</button>
+                            <button id="resetMapOperator" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input:</div>
+                        <div id="mapInputStream" class="marble-timeline"></div>
+                        <div class="operator-box" data-label="PIPE: map(x => x * 10)">x * 10</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="mapOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="mapLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="map"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Filter -->
+                    <div class="interactive-demo" data-demo-id="filter" data-search-terms="filter, lọc">
+                        <h3 class="text-lg mb-3"><code class="text-blue-600">filter(fn)</code> - Lọc</h3>
+                        <p class="mb-4">Chỉ cho phép các giá trị thỏa mãn một điều kiện đi qua. Ví dụ: chỉ lấy các số chẵn.</p>
+                        <div class="demo-controls">
+                            <button id="runFilterOperator" class="btn">Chạy Filter</button>
+                            <button id="resetFilterOperator" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input:</div>
+                        <div id="filterInputStream" class="marble-timeline"></div>
+                        <div class="operator-box" data-label="PIPE: filter(x => x % 2 === 0)">x % 2 === 0</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="filterOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="filterLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="filter"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- Tap -->
+                    <div class="interactive-demo" data-demo-id="tap" data-search-terms="tap, side effect, log, hành động phụ">
+                        <h3 class="text-lg mb-3"><code class="text-green-600">tap(fn)</code> - Hành động phụ</h3>
+                        <p class="mb-4">Thực hiện một hành động phụ (ví dụ: logging) với mỗi giá trị mà không làm thay đổi luồng.</p>
+                        <div class="demo-controls">
+                            <button id="runTapOperator" class="btn">Chạy Tap</button>
+                            <button id="resetTapOperator" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input:</div>
+                        <div id="tapInputStream" class="marble-timeline"></div>
+                        <div class="operator-box" data-label="PIPE: tap(x => console.log(x))">LOG</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="tapOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="tapLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="tap"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Scan -->
+                    <div class="interactive-demo" data-demo-id="scan" data-search-terms="scan, tích lũy, reduce">
+                        <h3 class="text-lg mb-3"><code class="text-orange-600">scan(fn, seed)</code> - Tích lũy</h3>
+                        <p class="mb-4">Tích lũy giá trị theo thời gian, tương tự <code>reduce</code> của Array nhưng phát ra mỗi giá trị trung gian.</p>
+                        <div class="demo-controls">
+                            <button id="runScanOperator" class="btn">Chạy Scan</button>
+                             <button id="resetScanOperator" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input:</div>
+                        <div id="scanInputStream" class="marble-timeline"></div>
+                        <div class="operator-box" data-label="PIPE: scan((acc, curr) => acc + curr, 0)">TÍNH TỔNG</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="scanOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="scanLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="scan"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Advanced Operators -->
+            <section id="advanced-operators" class="content-section">
+                 <h2 class="text-2xl md:text-3xl mb-6 section-title">3. Operators Chuyển Đổi (Flattening)</h2>
+                 <p class="mb-4 info-card">Các operators này xử lý "Observable của Observable" (luồng lồng trong luồng). Tình huống phổ biến là khi một sự kiện (như click) kích hoạt một tác vụ bất đồng bộ khác (như gọi API).</p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- mergeMap -->
+                    <div class="interactive-demo" data-demo-id="mergeMap" data-search-terms="mergeMap, flatMap, song song">
+                        <h3 class="text-lg mb-3"><code class="text-red-600">mergeMap</code> - Hợp nhất luồng</h3>
+                        <p class="mb-4">Tạo và đăng ký vào một luồng con cho mỗi giá trị từ luồng cha. Tất cả các luồng con chạy song song và kết quả được hợp nhất.</p>
+                         <div class="demo-controls">
+                            <button id="runMergeMap" class="btn">Click để phát luồng con</button>
+                             <button id="resetMergeMap" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input (Clicks):</div>
+                        <div id="mergeMapInputStream" class="marble-timeline"></div>
+                        <div class="operator-box" data-label="PIPE: mergeMap">Tạo & Hợp nhất luồng con</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="mergeMapOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="mergeMapLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="use-case-box">Trường hợp sử dụng: Khi bạn cần thực hiện nhiều tác vụ bất đồng bộ song song và không quan tâm đến thứ tự hoàn thành của chúng (ví dụ: tải nhiều ảnh cùng lúc).</div>
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="flattening"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- switchMap -->
+                    <div class="interactive-demo" data-demo-id="switchMap" data-search-terms="switchMap, hủy, chuyển, tìm kiếm">
+                         <h3 class="text-lg mb-3 tooltip-container"><code class="text-yellow-600">switchMap</code> - Chuyển luồng
+                             <span class="tooltip-text">Khi có giá trị mới từ nguồn, `switchMap` sẽ hủy (unsubscribe) luồng con (inner observable) trước đó và chuyển sang luồng con mới. Rất hữu ích để tránh các tác vụ lỗi thời.</span>
+                         </h3>
+                        <p class="mb-4">Giống <code>mergeMap</code>, nhưng khi luồng cha phát giá trị mới, nó sẽ hủy luồng con trước đó và chuyển sang luồng con mới.</p>
+                        <div class="demo-controls">
+                            <button id="runSwitchMap" class="btn">Click để chuyển luồng</button>
+                            <button id="resetSwitchMap" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input (Clicks):</div>
+                        <div id="switchMapInputStream" class="marble-timeline"></div>
+                        <div class="operator-box" data-label="PIPE: switchMap">Hủy luồng cũ & Chuyển luồng mới</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="switchMapOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="switchMapLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                           <div class="use-case-box">Trường hợp sử dụng: Cực kỳ hữu ích cho các tính năng như gợi ý tìm kiếm (typeahead), khi bạn chỉ quan tâm đến kết quả của lần gõ cuối cùng và muốn hủy các yêu cầu API cũ.</div>
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="flattening"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- concatMap -->
+                    <div class="interactive-demo" data-demo-id="concatMap" data-search-terms="concatMap, nối, tuần tự, thứ tự">
+                        <h3 class="text-lg mb-3"><code class="text-green-600">concatMap</code> - Nối luồng</h3>
+                        <p class="mb-4">Chạy các luồng con một cách tuần tự. Luồng con tiếp theo chỉ bắt đầu khi luồng con trước đó đã hoàn thành. Đảm bảo thứ tự.</p>
+                         <div class="demo-controls">
+                            <button id="runConcatMap" class="btn">Click để xếp hàng luồng</button>
+                            <button id="resetConcatMap" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input (Clicks):</div>
+                        <div id="concatMapInputStream" class="marble-timeline"></div>
+                        <div class="operator-box" data-label="PIPE: concatMap">Xếp hàng & Chạy tuần tự</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="concatMapOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="concatMapLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="use-case-box">Trường hợp sử dụng: Khi thứ tự thực hiện là quan trọng. Ví dụ: một chuỗi các yêu cầu API đọc-ghi mà yêu cầu sau phụ thuộc vào kết quả của yêu cầu trước.</div>
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="flattening"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- exhaustMap -->
+                    <div class="interactive-demo" data-demo-id="exhaustMap" data-search-terms="exhaustMap, bỏ qua, spam, lock">
+                        <h3 class="text-lg mb-3"><code class="text-blue-600">exhaustMap</code> - Bỏ qua luồng</h3>
+                        <p class="mb-4">Bỏ qua các giá trị mới từ luồng cha trong khi một luồng con đang hoạt động. Hữu ích để chống click-spam.</p>
+                         <div class="demo-controls">
+                            <button id="runExhaustMap" class="btn">Click (thử click nhanh)</button>
+                            <button id="resetExhaustMap" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input (Clicks):</div>
+                        <div id="exhaustMapInputStream" class="marble-timeline"></div>
+                        <div class="operator-box" data-label="PIPE: exhaustMap">Bỏ qua click khi đang bận</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="exhaustMapOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="exhaustMapLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="use-case-box">Trường hợp sử dụng: Hoàn hảo cho các nút bấm chỉ nên được xử lý một lần, như nút "Login" hoặc "Submit", để ngăn người dùng gửi nhiều yêu cầu bằng cách click liên tục.</div>
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="flattening"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 4: Combination Operators -->
+            <section id="more-advanced-operators" class="content-section">
+                <h2 class="text-2xl md:text-3xl mb-6 section-title">4. Operators Kết Hợp (Combination)</h2>
+                <p class="mb-4 info-card">Các operators này cho phép bạn kết hợp nhiều luồng dữ liệu lại với nhau theo những cách khác nhau.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- combineLatest -->
+                    <div class="interactive-demo" data-demo-id="combineLatest" data-search-terms="combineLatest, kết hợp, form validation">
+                        <h3 class="text-lg mb-3"><code class="text-indigo-600">combineLatest</code> - Kết hợp giá trị mới nhất</h3>
+                        <p class="mb-4">Khi bất kỳ luồng nào phát, nó sẽ phát ra một mảng chứa giá trị mới nhất từ TẤT CẢ các luồng. Sẽ không phát gì cho đến khi mọi luồng đã phát ít nhất một lần.</p>
+                        <div class="demo-controls">
+                           <button id="emitSourceACombine" class="btn btn-secondary">Phát Stream A</button>
+                           <button id="emitSourceBCombine" class="btn btn-secondary">Phát Stream B</button>
+                           <button id="resetCombine" class="btn btn-danger btn-sm">Reset</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>Stream A: <div id="combineSourceAStream" class="marble-timeline min-h-[50px]"></div></div>
+                            <div>Stream B: <div id="combineSourceBStream" class="marble-timeline min-h-[50px]"></div></div>
+                        </div>
+                        <div class="operator-box" data-label="combineLatest([streamA, streamB])">Kết hợp</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="combineOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="combineLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="combineLatest"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- forkJoin -->
+                    <div class="interactive-demo" data-demo-id="forkJoin" data-search-terms="forkJoin, promise.all, đồng bộ, chờ">
+                        <h3 class="text-lg mb-3"><code class="text-teal-600">forkJoin</code> - Chờ tất cả hoàn thành</h3>
+                        <p class="mb-4">Tương tự <code>Promise.all</code>. Chờ cho tất cả các luồng nguồn hoàn thành, sau đó phát ra một mảng chứa giá trị CUỐI CÙNG từ mỗi luồng.</p>
+                         <div class="demo-controls">
+                            <button id="runForkJoin" class="btn">Chạy 2 API song song</button>
+                             <button id="resetForkJoin" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>API 1 (1.5s): <div id="forkJoinSource1Stream" class="marble-timeline min-h-[50px]"></div></div>
+                            <div>API 2 (2.5s): <div id="forkJoinSource2Stream" class="marble-timeline min-h-[50px]"></div></div>
+                        </div>
+                        <div class="operator-box" data-label="forkJoin({ api1, api2 })">Chờ</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="forkJoinOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="forkJoinLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="forkJoin"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section NEW: Utility Operators -->
+            <section id="utility-operators" class="content-section">
+                <h2 class="text-2xl md:text-3xl mb-6 section-title">5. Utility Operators</h2>
+                 <p class="mb-4 info-card">Đây là tập hợp các toán tử tiện ích mạnh mẽ để điều khiển luồng dữ liệu, đặc biệt hữu ích trong việc xử lý tương tác người dùng hoặc các nguồn phát dữ liệu dày đặc.</p>
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- DebounceTime vs ThrottleTime -->
+                    <div class="interactive-demo col-span-1" data-demo-id="rateLimit" data-search-terms="debounceTime, throttleTime, so sánh">
+                        <h3 class="text-lg mb-3">So sánh <code class="text-purple-600">debounceTime</code> và <code class="text-blue-600">throttleTime</code></h3>
+                        <p class="mb-4">Click vào nút bên dưới thật nhanh và nhiều lần để xem sự khác biệt. <span class="text-blue-700">Debounce</span> chỉ phát giá trị sau khi có một khoảng lặng. <span class="text-blue-700">Throttle</span> phát giá trị đầu tiên, sau đó chặn trong một khoảng thời gian.</p>
+                        <div class="demo-controls">
+                            <button id="runRateLimit" class="btn btn-warning">CLICK VÀO TÔI!</button>
+                             <button id="resetRateLimit" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input (Clicks):</div>
+                        <div id="rateLimitInputStream" class="marble-timeline"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                            <div>
+                                <div class="operator-box" data-label="debounceTime(1000)">Debounce Output</div>
+                                <div id="debounceOutputStream" class="marble-timeline"></div>
+                            </div>
+                             <div>
+                                <div class="operator-box" data-label="throttleTime(1000)">Throttle Output</div>
+                                <div id="throttleOutputStream" class="marble-timeline"></div>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="rateLimitLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="rateLimit"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- bufferTime -->
+                        <div class="interactive-demo" data-demo-id="bufferTime" data-search-terms="bufferTime, gom, bộ đệm">
+                            <h3 class="text-lg mb-3"><code class="text-green-600">bufferTime(2000)</code></h3>
+                            <p class="mb-4">Gom các giá trị từ luồng nguồn vào một bộ đệm và phát ra bộ đệm này sau mỗi 2 giây.</p>
+                            <div class="demo-controls">
+                                <button id="runBufferTime" class="btn">Click để phát giá trị</button>
+                                <button id="resetBufferTime" class="btn btn-secondary btn-sm">Reset</button>
+                            </div>
+                            <div class="text-sm text-gray-600 mb-2 font-medium">Input (Clicks):</div>
+                            <div id="bufferTimeInputStream" class="marble-timeline"></div>
+                            <div class="operator-box" data-label="bufferTime(2000)">Gom mỗi 2s</div>
+                            <div class="text-sm text-gray-600 mb-2 font-medium">Output (mảng giá trị):</div>
+                            <div id="bufferTimeOutputStream" class="marble-timeline"></div>
+                            <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                            <div id="bufferTimeLoggerOutput" class="log-box"></div>
+                             <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                            <div class="code-block-wrapper">
+                                <div class="relative">
+                                    <pre><code class="language-javascript" data-code-id="bufferTime"></code></pre>
+                                    <button class="btn btn-sm copy-code-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                         <!-- pairwise -->
+                        <div class="interactive-demo" data-demo-id="pairwise" data-search-terms="pairwise, cặp, trước sau">
+                            <h3 class="text-lg mb-3"><code class="text-orange-600">pairwise()</code></h3>
+                            <p class="mb-4">Nhóm các giá trị liên tiếp thành từng cặp `[trước, sau]` và phát ra.</p>
+                             <div class="demo-controls">
+                                <button id="runPairwise" class="btn">Chạy luồng số</button>
+                                 <button id="resetPairwise" class="btn btn-secondary btn-sm">Reset</button>
+                            </div>
+                            <div class="text-sm text-gray-600 mb-2 font-medium">Input:</div>
+                            <div id="pairwiseInputStream" class="marble-timeline"></div>
+                            <div class="operator-box" data-label="pairwise()">Ghép cặp</div>
+                            <div class="text-sm text-gray-600 mb-2 font-medium">Output ([trước, sau]):</div>
+                            <div id="pairwiseOutputStream" class="marble-timeline"></div>
+                            <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                            <div id="pairwiseLoggerOutput" class="log-box"></div>
+                             <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                            <div class="code-block-wrapper">
+                                <div class="relative">
+                                    <pre><code class="language-javascript" data-code-id="pairwise"></code></pre>
+                                    <button class="btn btn-sm copy-code-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- withLatestFrom -->
+                    <div class="interactive-demo" data-demo-id="withLatestFrom" data-search-terms="withLatestFrom, kết hợp, giá trị cuối">
+                        <h3 class="text-lg mb-3"><code class="text-indigo-600">withLatestFrom(other$)</code></h3>
+                        <p class="mb-4">Khi luồng chính (Clicks) phát, nó sẽ kết hợp giá trị của mình với giá trị mới nhất từ luồng phụ (Timer). Luồng phụ chạy ngầm.</p>
+                         <div class="demo-controls">
+                            <button id="runWithLatestFrom" class="btn">Click để lấy giá trị từ Timer</button>
+                             <button id="resetWithLatestFrom" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Luồng chính (Clicks):</div>
+                                <div id="wlfSourceStream" class="marble-timeline"></div>
+                            </div>
+                             <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Luồng phụ (Timer mỗi 1.5s):</div>
+                                <div id="wlfOtherStream" class="marble-timeline"></div>
+                            </div>
+                        </div>
+                        <div class="operator-box" data-label="withLatestFrom(timer$)">Kết hợp</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output ([click, timer]):</div>
+                        <div id="wlfOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="wlfLoggerOutput" class="log-box"></div>
+                         <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="withLatestFrom"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Section 5: Useful Operators -->
+            <section id="useful-operators" class="content-section">
+                <h2 class="text-2xl md:text-3xl mb-6 section-title">6. Operators Hữu Ích Khác</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Take -->
+                    <div class="interactive-demo" data-demo-id="take" data-search-terms="take, giới hạn, lấy">
+                        <h3 class="text-lg mb-3"><code class="text-green-600">take(count)</code> - Giới Hạn Số Lượng</h3>
+                        <p class="mb-4">Chỉ lấy một số lượng giá trị xác định từ luồng dữ liệu.</p>
+                        <div class="demo-controls">
+                            <button id="runTakeOperator" class="btn mb-2">Chạy Take</button>
+                             <button id="resetTakeOperator" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        
+                        <label for="takeCountInput" class="text-sm text-gray-700 mr-2">Số lượng lấy:</label>
+                        <input type="number" id="takeCountInput" value="3" class="input-field input-field-sm w-20 mb-4">
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input:</div>
+                        <div id="takeInputStream" class="marble-timeline"></div>
+                        
+                        <div class="operator-box" data-label="PIPE: TAKE">TAKE(<span id="takeCountDisplay">3</span>)</div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="takeOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="takeLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="take"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Zip -->
+                    <div class="interactive-demo" data-demo-id="zip" data-search-terms="zip, ghép cặp, đôi">
+                        <h3 class="text-lg mb-3"><code class="text-orange-600">zip(obs1,...)</code> - Ghép Cặp</h3>
+                        <p class="mb-4">Ghép cặp các giá trị từ nhiều luồng theo thứ tự xuất hiện.</p>
+                        
+                        <div class="demo-controls">
+                            <button id="emitSource1Zip" class="btn btn-secondary">Phát Stream A</button>
+                            <button id="emitSource2Zip" class="btn btn-secondary">Phát Stream B</button>
+                             <button id="resetZipOperator" class="btn btn-danger btn-sm">Reset</button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Stream A:</div>
+                                <div id="zipSource1Stream" class="marble-timeline min-h-[50px]"></div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Stream B:</div>
+                                <div id="zipSource2Stream" class="marble-timeline min-h-[50px]"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="operator-box" data-label="ZIP">ZIP</div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Output (Ghép cặp):</div>
+                        <div id="zipOutputStream" class="marble-timeline"></div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="zipLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="zip"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- CatchError -->
+                    <div class="interactive-demo" data-demo-id="catchError" data-search-terms="catchError, error, xử lý lỗi, try catch">
+                        <h3 class="text-lg mb-3"><code class="text-red-700">catchError(fn)</code> - Xử Lý Lỗi</h3>
+                        <p class="mb-4">Bắt và xử lý lỗi trong luồng dữ liệu, trả về một giá trị thay thế hoặc luồng mới.</p>
+                        
+                        <div class="demo-controls">
+                            <button id="runCatchErrorStream" class="btn btn-danger">Chạy Stream (LỖI)</button>
+                            <button id="runCatchErrorStreamNoError" class="btn btn-success">Chạy Stream (OK)</button>
+                             <button id="resetCatchError" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Input:</div>
+                        <div id="catchErrorInputStream" class="marble-timeline"></div>
+                        
+                        <div class="operator-box" data-label="PIPE: CATCHERROR">CATCHERROR (trả về 'Đã Fix')</div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="catchErrorOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="catchErrorLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="catchError"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- StartWith -->
+                    <div class="interactive-demo" data-demo-id="startWith" data-search-terms="startWith, bắt đầu, giá trị khởi tạo">
+                        <h3 class="text-lg mb-3"><code class="text-blue-500">startWith(...values)</code> - Bắt Đầu Với Giá Trị</h3>
+                        <p class="mb-4">Thêm các giá trị vào đầu luồng dữ liệu trước khi luồng chính bắt đầu phát giá trị.</p>
+                        <div class="demo-controls">
+                             <button id="runStartWithOperator" class="btn mb-4">Chạy StartWith</button>
+                             <button id="resetStartWithOperator" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <input type="text" id="startWithValuesInput" value="-1,0" class="input-field mb-4" placeholder="Giá trị bắt đầu, cách nhau bởi dấu phẩy, vd: -1,0,Hi">
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Stream gốc:</div>
+                        <div id="startWithInputStream" class="marble-timeline"></div>
+                        
+                        <div class="operator-box" data-label="PIPE: STARTWITH">STARTWITH(<span id="startWithValuesDisplay">-1,0</span>)</div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Output:</div>
+                        <div id="startWithOutputStream" class="marble-timeline"></div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="startWithLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="startWith"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Subjects -->
+            <section id="subjects" class="content-section">
+                <h2 class="text-2xl md:text-3xl mb-6 section-title">7. Subjects - Đa Hướng Dữ Liệu</h2>
+                
+                <div class="info-card">
+                    <p>Subject là một dạng đặc biệt của Observable cho phép đa hướng dữ liệu - nhiều Observer có thể subscribe vào cùng một Subject. Subject cũng là một Observer, có thể nhận dữ liệu thông qua các phương thức next(), error() và complete().</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Subject -->
+                    <div class="interactive-demo" data-demo-id="subject" data-search-terms="Subject, multicast, đa hướng">
+                        <h3 class="text-lg mb-3"><code class="text-purple-700">Subject</code></h3>
+                        <p class="mb-4">Subject cơ bản - Observer chỉ nhận các giá trị phát ra sau khi subscribe.</p>
+                        
+                        <div class="demo-controls">
+                            <button id="runBasicSubject" class="btn btn-success">Tạo Subject & Sub1</button>
+                            <button id="emitToBasicSubject" class="btn btn-warning">Phát</button>
+                            <button id="addBasicSubjectSub2" class="btn btn-info">Thêm Sub2</button>
+                            <button id="resetBasicSubject" class="btn btn-danger btn-sm">Reset</button>
+                        </div>
+                        
+                        <div class="subject-box" data-label="SUBJECT">SUBJECT</div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log Subject:</div>
+                        <div id="basicSubjectLog" class="log-box"></div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Subscriber 1 nhận:</div>
+                                <div id="basicSubjectSub1Output" class="marble-timeline min-h-[50px]"></div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Subscriber 2 nhận:</div>
+                                <div id="basicSubjectSub2Output" class="marble-timeline min-h-[50px]"></div>
+                            </div>
+                        </div>
+                         <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="subject"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- BehaviorSubject -->
+                    <div class="interactive-demo" data-demo-id="behaviorSubject" data-search-terms="BehaviorSubject, state, trạng thái">
+                        <h3 class="text-lg mb-3"><code class="text-green-700">BehaviorSubject</code></h3>
+                        <p class="mb-4">Lưu trữ giá trị hiện tại và phát nó cho các subscriber mới ngay khi họ subscribe.</p>
+                        
+                         <div class="demo-controls">
+                            <button id="runBehaviorSubject" class="btn btn-success">Tạo & Sub1</button>
+                            <button id="emitToBehaviorSubject" class="btn btn-warning">Phát</button>
+                            <button id="addBehaviorSubjectSub2" class="btn btn-info">Thêm Sub2</button>
+                            <button id="resetBehaviorSubject" class="btn btn-danger btn-sm">Reset</button>
+                        </div>
+                        
+                        <div class="subject-box" data-label="BEHAVIOR_SUBJECT">BEHAVIOR_SUBJECT (khởi tạo với 'Khánh')</div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log BehaviorSubject:</div>
+                        <div id="behaviorSubjectLog" class="log-box"></div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Subscriber 1 nhận:</div>
+                                <div id="behaviorSubjectSub1Output" class="marble-timeline min-h-[50px]"></div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Subscriber 2 nhận:</div>
+                                <div id="behaviorSubjectSub2Output" class="marble-timeline min-h-[50px]"></div>
+                            </div>
+                        </div>
+                         <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="behaviorSubject"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ReplaySubject -->
+                    <div class="interactive-demo" data-demo-id="replaySubject" data-search-terms="ReplaySubject, cache, bộ đệm, phát lại">
+                        <h3 class="text-lg mb-3"><code class="text-blue-700">ReplaySubject</code></h3>
+                        <p class="mb-4">Lưu trữ một số lượng giá trị đã phát trước đó và phát lại cho các subscriber mới.</p>
+                        
+                         <div class="demo-controls">
+                            <button id="runReplaySubject" class="btn btn-success">Tạo & Sub1</button>
+                            <button id="emitToReplaySubject" class="btn btn-warning">Phát</button>
+                            <button id="addReplaySubjectSub2" class="btn btn-info">Thêm Sub2</button>
+                            <button id="resetReplaySubject" class="btn btn-danger btn-sm">Reset</button>
+                        </div>
+                        
+                        <div class="subject-box" data-label="REPLAY_SUBJECT">REPLAY_SUBJECT (nhớ 2 giá trị)</div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log ReplaySubject:</div>
+                        <div id="replaySubjectLog" class="log-box"></div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Subscriber 1 nhận:</div>
+                                <div id="replaySubjectSub1Output" class="marble-timeline min-h-[50px]"></div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2 font-medium">Subscriber 2 nhận:</div>
+                                <div id="replaySubjectSub2Output" class="marble-timeline min-h-[50px]"></div>
+                            </div>
+                        </div>
+                         <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="replaySubject"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Real-World Examples -->
+            <section id="real-world" class="content-section">
+                 <h2 class="text-2xl md:text-3xl mb-6 section-title">8. Ví Dụ Thực Tế</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Simple Type Ahead -->
+                    <div class="interactive-demo" data-demo-id="typeahead" data-search-terms="typeahead, gợi ý tìm kiếm, search, api">
+                        <h3 class="text-lg mb-3">8.1. Gợi ý tìm kiếm (Typeahead)</h3>
+                        <p class="mb-4">Một ứng dụng kinh điển của RxJS: đợi người dùng ngừng gõ, sau đó mới thực hiện tìm kiếm để tránh các request không cần thiết.</p>
+                        <input type="text" id="typeaheadInput" placeholder="Gõ để tìm kiếm..." class="input-field mb-4">
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Stream gõ phím:</div>
+                        <div id="typeaheadInputStream" class="marble-timeline"></div>
+                        <div class="operator-box" data-label="PIPE: debounceTime(400) -> distinctUntilChanged() -> switchMap(apiCall)">Xử lý tìm kiếm</div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Kết quả từ API (giả):</div>
+                        <div id="typeaheadResult" class="bg-gray-50 p-4 rounded-lg min-h-[80px]"></div>
+                         <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="typeaheadLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="typeahead"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="interactive-demo" data-demo-id="progressBar" data-search-terms="progress bar, thanh tiến trình, tải">
+                        <h3 class="text-lg mb-3">8.2. Thanh tiến trình (Progress Bar)</h3>
+                        <p class="mb-4">Sử dụng RxJS để điều khiển một thanh tiến trình, rất hữu ích cho việc hiển thị trạng thái tải file hoặc các tác vụ kéo dài.</p>
+                        <div class="demo-controls">
+                            <button id="startProgressBar" class="btn">Bắt đầu tải</button>
+                            <button id="resetProgressBar" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div class="progress-bar mt-4">
+                            <div id="progressFill" class="progress-fill"></div>
+                        </div>
+                        <div id="progressStatus" class="text-center text-blue-700 mt-2"></div>
+                         <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="progressBarLoggerOutput" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="progressBar"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Real-time Form Validation -->
+                 <div class="interactive-demo col-span-1 md:col-span-2" data-demo-id="formValidation" data-search-terms="form, validation, xác thực, combineLatest">
+                     <h3 class="text-lg mb-3">8.3. Xác thực biểu mẫu (Real-time Form Validation)</h3>
+                     <p class="mb-4">Sử dụng <code>combineLatest</code> để tổng hợp trạng thái hợp lệ của nhiều trường và chỉ cho phép gửi khi tất cả đều OK. Tên người dùng "admin" hoặc "root" sẽ bị báo là đã tồn tại (kiểm tra bất đồng bộ).</p>
+                    <form id="validationForm" onsubmit="event.preventDefault()">
+                        <div>
+                            <label for="usernameInput">Tên người dùng</label>
+                            <input type="text" id="usernameInput" class="input-field" placeholder="Ít nhất 3 ký tự, không phải 'admin'">
+                            <div id="usernameValidationMsg" class="validation-message"></div>
+                        </div>
+                         <div>
+                            <label for="emailInput">Email</label>
+                            <input type="email" id="emailInput" class="input-field" placeholder="Nhập email hợp lệ">
+                            <div id="emailValidationMsg" class="validation-message"></div>
+                        </div>
+                         <div>
+                            <label for="passwordInput">Mật khẩu</label>
+                            <input type="password" id="passwordInput" class="input-field" placeholder="Ít nhất 6 ký tự">
+                            <div id="passwordValidationMsg" class="validation-message"></div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button type="submit" id="submitFormBtn" class="btn btn-success" disabled>Đăng Ký</button>
+                            <span id="formStatus" class="text-red-600">Vui lòng điền đúng thông tin.</span>
+                        </div>
+                    </form>
+                    <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                    <div id="formLoggerOutput" class="log-box"></div>
+                    <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                    <div class="code-block-wrapper">
+                        <div class="relative">
+                            <pre><code class="language-javascript" data-code-id="formValidation"></code></pre>
+                            <button class="btn btn-sm copy-code-btn">Copy</button>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+            <!-- Section 8: Hardcore Examples -->
+            <section id="hardcore-examples" class="content-section">
+                <h2 class="text-2xl md:text-3xl mb-6 section-title">9. Ví Dụ Khó Nhằn</h2>
+                
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Advanced Type Ahead -->
+                    <div class="interactive-demo" data-demo-id="advancedSearch" data-search-terms="tìm kiếm nâng cao, search, loading, catchError">
+                        <h3 class="text-lg mb-3">9.1. Tìm Kiếm Nâng Cao: Loading & Xử Lý Lỗi</h3>
+                        <p class="mb-4">Tìm kiếm thông minh với hiệu ứng loading, xử lý lỗi và gợi ý tự động.</p>
+                        
+                        <input type="text" id="advancedSearchInput" placeholder="Gõ 'error' để thử lỗi API..." class="input-field mb-4">
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Stream Gõ Phím:</div>
+                        <div id="advancedSearchOuterStream" class="marble-timeline"></div>
+                        
+                        <div class="operator-box" data-label="PIPE: Xử Lý">debounceTime → distinctUntilChanged → switchMap (API call + startWith + catchError)</div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Kết quả tìm kiếm:</div>
+                        <div id="advancedSearchResultStream" class="marble-timeline"></div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="advancedSearchLogger" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="advancedSearch"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <!-- Drag and Drop -->
+                        <div class="interactive-demo" data-demo-id="dragDrop" data-search-terms="kéo thả, drag drop, mousedown, mousemove, mouseup">
+                            <h3 class="text-lg mb-3">9.2. Kéo Thả Bằng RxJS</h3>
+                            <p class="mb-4">Triển khai tính năng kéo thả sử dụng các Observable để xử lý sự kiện.</p>
+                             <div class="demo-controls">
+                                 <button id="resetDragDrop" class="btn btn-secondary btn-sm">Reset Vị Trí</button>
+                            </div>
+                            <div style="position: relative; height: 250px; border: 1px solid var(--border-color); padding: 10px; background: var(--bg-interactive); border-radius: 8px;">
+                                <div id="draggableBox" class="draggable" style="top: 20px; left: 20px;">KÉO TÔI</div>
+                            </div>
+                            
+                            <div id="dropZone">Thả vào đây!</div>
+                            
+                            <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                            <div id="dragDropLogger" class="log-box"></div>
+                            <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                            <div class="code-block-wrapper">
+                                <div class="relative">
+                                    <pre><code class="language-javascript" data-code-id="dragDrop"></code></pre>
+                                    <button class="btn btn-sm copy-code-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Polling -->
+                        <div class="interactive-demo" data-demo-id="polling" data-search-terms="polling, lặp lại, định kỳ, timer, takeUntil">
+                            <h3 class="text-lg mb-3">9.3. Lấy Dữ Liệu Định Kỳ (Polling)</h3>
+                            <p class="mb-4">Tự động lấy dữ liệu mới từ server theo chu kỳ với khả năng dừng lại.</p>
+                            
+                            <div class="demo-controls">
+                                <button id="startPollingBtn" class="btn btn-success">Bắt Đầu Poll</button>
+                                <button id="stopPollingBtn" class="btn btn-danger" disabled>Dừng Poll</button>
+                            </div>
+                            
+                            <div id="pollingStatus" class="text-sm text-gray-600 my-2">Trạng thái: Chưa chạy</div>
+                            
+                            <div class="text-sm text-gray-600 mb-2 font-medium">Dữ liệu nhận được:</div>
+                            <div id="pollingDataStream" class="marble-timeline"></div>
+                            
+                            <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                            <div id="pollingLogger" class="log-box"></div>
+                             <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                            <div class="code-block-wrapper">
+                                <div class="relative">
+                                    <pre><code class="language-javascript" data-code-id="polling"></code></pre>
+                                    <button class="btn btn-sm copy-code-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 9: Ultra Hardcore Examples -->
+            <section id="ultra-hardcore-examples" class="content-section">
+                <h2 class="text-2xl md:text-3xl mb-6 section-title">10. Ví Dụ Siêu Khó Nhằn</h2>
+                
+                <div class="interactive-demo" data-demo-id="multiApiSearch" data-search-terms="multi api, nhiều nguồn, forkJoin, siêu khó">
+                    <h3 class="text-lg mb-3">10.1. Gợi Ý Từ Nhiều Nguồn API</h3>
+                    <p class="mb-4">Gõ vào ô tìm kiếm, hệ thống sẽ gọi đồng thời nhiều API khác nhau và kết hợp kết quả.</p>
+                    
+                    <input type="text" id="multiApiSearchInput" placeholder="Gõ để tìm từ 2 nguồn..." class="input-field mb-4">
+                    
+                    <div class="text-sm text-gray-600 mb-2 font-medium">Stream Gõ Phím:</div>
+                    <div id="multiApiSearchOuterStream" class="marble-timeline"></div>
+                    
+                    <div class="operator-box" data-label="PIPE: Xử Lý">debounceTime → distinctUntilChanged → filter → switchMap (forkJoin [API1, API2])</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <div class="text-sm text-gray-600 mb-2 font-medium">API 1 Response:</div>
+                            <div id="multiApi1ResultStream" class="marble-timeline min-h-[50px]"></div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600 mb-2 font-medium">API 2 Response:</div>
+                            <div id="multiApi2ResultStream" class="marble-timeline min-h-[50px]"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-gray-600 mb-2 font-medium">Kết quả gộp (API1 + API2):</div>
+                    <div id="multiApiCombinedResultStream" class="marble-timeline"></div>
+                    
+                    <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                    <div id="multiApiSearchLogger" class="log-box"></div>
+                     <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                    <div class="code-block-wrapper">
+                        <div class="relative">
+                            <pre><code class="language-javascript" data-code-id="multiApiSearch"></code></pre>
+                            <button class="btn btn-sm copy-code-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <!-- Sequential Tasks -->
+                    <div class="interactive-demo" data-demo-id="sequentialTasks" data-search-terms="tuần tự, chuỗi, retry, concat, defer, thử lại">
+                        <h3 class="text-lg mb-3">10.2. Chuỗi Tác Vụ Tuần Tự & Thử Lại</h3>
+                        <p class="mb-4">Thực hiện một chuỗi tác vụ tuần tự, mỗi tác vụ có thể thử lại nếu gặp lỗi.</p>
+                        
+                        <div class="demo-controls">
+                            <button id="startSequentialTasksBtn" class="btn btn-warning">Bắt Đầu Chuỗi Tác Vụ</button>
+                            <button id="resetSequentialTasksBtn" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium">Tiến Trình Tác Vụ:</div>
+                        <div id="sequentialTasksProgressStream" class="marble-timeline"></div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="sequentialTasksLogger" class="log-box"></div>
+                         <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="sequentialTasks"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Infinite Scroll -->
+                    <div class="interactive-demo" data-demo-id="infiniteScroll" data-search-terms="cuộn vô tận, infinite scroll, tải thêm">
+                        <h3 class="text-lg mb-3">10.3. Cuộn Vô Tận (Infinite Scroll)</h3>
+                        <p class="mb-4">Tự động tải thêm dữ liệu khi người dùng cuộn đến cuối trang.</p>
+                         <div class="demo-controls">
+                             <button id="resetInfiniteScrollBtn" class="btn btn-secondary btn-sm">Reset</button>
+                        </div>
+                        <div id="infiniteScrollContainer">
+                            <!-- Items will be added here -->
+                        </div>
+                        
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="infiniteScrollLogger" class="log-box"></div>
+                         <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="infiniteScroll"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Section 11: Advanced Applications -->
+            <section id="advanced-apps" class="content-section">
+                <h2 class="text-2xl md:text-3xl mb-6 section-title">11. Ứng Dụng Nâng Cao</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Auto-save Form -->
+                    <div class="interactive-demo" data-demo-id="autosave" data-search-terms="auto save, tự động lưu, form, debounceTime">
+                        <h3 class="text-lg mb-3">11.1. Tự Động Lưu Form</h3>
+                        <p class="mb-4">Tự động lưu nội dung khi người dùng ngừng gõ, hiển thị trạng thái lưu.</p>
+                        <div id="autosaveStatus" class="text-right text-sm italic text-gray-500 mb-2 h-5">Chưa có gì để lưu.</div>
+                        <textarea id="autosaveTextarea" class="input-field" rows="6" placeholder="Gõ vào đây, hệ thống sẽ tự động lưu..."></textarea>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log:</div>
+                        <div id="autosaveLogger" class="log-box"></div>
+                        <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="autosave"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- WebSocket -->
+                    <div class="interactive-demo" data-demo-id="websocket" data-search-terms="websocket, socket, retry, real-time, thời gian thực">
+                        <h3 class="text-lg mb-3">11.2. WebSocket với Tự Động Kết Nối Lại</h3>
+                        <p class="mb-4">Kết nối đến một server WebSocket, gửi tin nhắn, và tự động kết nối lại khi mất kết nối.</p>
+                        <div class="demo-controls">
+                            <button id="wsConnectBtn" class="btn btn-success">Kết Nối</button>
+                            <button id="wsDisconnectBtn" class="btn btn-danger" disabled>Ngắt Kết Nối</button>
+                        </div>
+                        <div id="wsStatus" class="my-2 p-2 rounded-lg text-center font-medium">Trạng thái: Đã ngắt kết nối.</div>
+                        <div class="flex gap-2 mt-2">
+                            <input type="text" id="wsMessageInput" class="input-field my-0" placeholder="Gửi tin nhắn..." disabled>
+                            <button id="wsSendBtn" class="btn my-0" disabled>Gửi</button>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2 font-medium mt-4">Log Tin Nhắn:</div>
+                        <div id="wsLogger" class="log-box"></div>
+                         <div class="mt-4 text-right"> <button class="btn btn-secondary btn-sm toggle-code-btn">Xem Code</button> </div>
+                        <div class="code-block-wrapper">
+                            <div class="relative">
+                                <pre><code class="language-javascript" data-code-id="websocket"></code></pre>
+                                <button class="btn btn-sm copy-code-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="mt-12 pt-6 border-t border-gray-200 text-center text-gray-600 text-sm">
+            <p>© 2025 Học RxJS Trực Quan. Tất cả quyền được bảo lưu.</p>
+            <p class="mt-2">Được phát triển với ❤️ bởi Nguyễn Ngọc Khánh</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const { Observable, fromEvent, of, Subject, timer, combineLatest, interval, BehaviorSubject, ReplaySubject, zip, throwError, EMPTY, merge, forkJoin, concat, defer, iif } = rxjs; 
+            const { webSocket } = rxjs.webSocket;
+            const { map, filter, tap, scan, delay, switchMap, debounceTime, distinctUntilChanged, mergeMap, concatMap, take, startWith, shareReplay, catchError, finalize, retry, takeUntil, exhaustMap, throttleTime, bufferTime, pairwise, withLatestFrom } = rxjs.operators; 
+
+            // --- Dark Mode ---
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            function applyDarkMode(state) {
+                 document.documentElement.classList.toggle('dark-mode', state);
+                 localStorage.setItem('darkMode', state);
+            }
+            darkModeToggle.addEventListener('click', () => {
+                const isDarkMode = document.documentElement.classList.contains('dark-mode');
+                applyDarkMode(!isDarkMode);
+            });
+            // Check for saved preference, otherwise use system preference
+            const savedMode = localStorage.getItem('darkMode');
+            if (savedMode !== null) {
+                applyDarkMode(savedMode === 'true');
+            } else {
+                applyDarkMode(prefersDark.matches);
+            }
+            prefersDark.addEventListener('change', (e) => {
+                 if (localStorage.getItem('darkMode') === null) {
+                    applyDarkMode(e.matches);
+                 }
+            });
+
+
+            // --- Scroll Progress Bar & Scrollspy ---
+            const scrollProgressBar = document.getElementById('scroll-progress-bar');
+            window.addEventListener('scroll', () => {
+                const scrollTop = document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrollPercent = (scrollTop / scrollHeight) * 100;
+                scrollProgressBar.style.width = scrollPercent + '%';
+            });
+            
+            const contentSections = document.querySelectorAll('.content-section');
+            const navButtons = document.querySelectorAll('.nav-button');
+
+            const scrollSpyObserver = new IntersectionObserver((entries) => {
+                let lastIntersecting = null;
+                 entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                       lastIntersecting = entry.target.id;
+                    }
+                });
+
+                if(lastIntersecting){
+                    navButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        if(btn.dataset.section === lastIntersecting) {
+                            btn.classList.add('active');
+                        }
+                    });
+                }
+
+            }, { rootMargin: "-40% 0px -60% 0px", threshold: 0 });
+            contentSections.forEach(section => scrollSpyObserver.observe(section));
+
+
+            // --- Code Snippets ---
+            const codeSnippets = {
+                firstObservable: `const { of, concatMap, delay } = rxjs;
+of('A', 'B', 'C').pipe(
+    // Dùng concatMap + delay để tạo hiệu ứng
+    concatMap(val => of(val).pipe(delay(300)))
+).subscribe({
+    next: val => console.log('Nhận giá trị:', val),
+    complete: () => console.log('Hoàn thành!')
+});`,
+                map: `const { interval, take, map, tap } = rxjs.operators;
+interval(500).pipe(
+    take(3),
+    map(i => i + 1), // -> 1, 2, 3
+    tap(val => console.log('Trước map:', val)),
+    map(val => val * 10) // -> 10, 20, 30
+).subscribe(val => console.log('Sau map:', val));`,
+                filter: `const { interval, take, map, tap, filter } = rxjs.operators;
+interval(500).pipe(
+    take(5),
+    map(i => i + 1), // -> 1, 2, 3, 4, 5
+    tap(val => console.log('Trước filter:', val)),
+    filter(val => val % 2 === 0) // -> 2, 4
+).subscribe(val => console.log('Sau filter:', val));`,
+                tap: `const { interval, take, map, tap } = rxjs.operators;
+interval(500).pipe(
+    take(3),
+    map(i => String.fromCharCode(65 + i)), // -> 'A', 'B', 'C'
+    tap(val => {
+        // Hành động phụ ở đây!
+        console.log(\`TAP đã thấy: \${val}\`);
+        // tap không thay đổi giá trị của luồng
+    })
+).subscribe(val => console.log('Observer nhận:', val));`,
+                scan: `const { interval, take, map, tap, scan } = rxjs.operators;
+interval(500).pipe(
+    take(4),
+    map(i => i + 1), // -> 1, 2, 3, 4
+    tap(val => console.log('Giá trị hiện tại:', val)),
+    // Giống reduce, nhưng phát ra giá trị tích lũy ở mỗi bước
+    scan((acc, curr) => acc + curr, 0) // -> 1, 3, 6, 10
+).subscribe(val => console.log('Tổng tích lũy:', val));`,
+                flattening: `// Code này áp dụng cho cả 4 ví dụ: mergeMap, switchMap, concatMap, exhaustMap
+// Chỉ cần thay thế operator tương ứng
+const { fromEvent, interval, take, map } = rxjs;
+const { mergeMap } = rxjs.operators; // Thay bằng switchMap, concatMap, exhaustMap
+
+const clicks$ = fromEvent(runButton, 'click');
+
+clicks$.pipe(
+    // Mỗi lần click, tạo một luồng con mới (inner observable)
+    // Luồng con này sẽ phát ra 3 giá trị, mỗi giá trị cách nhau 0.6s
+    mergeMap(() => 
+        interval(600).pipe(
+            take(3),
+            map(i => \`Click \${clickCount}: \${i}\`)
+        )
+    )
+).subscribe(val => console.log(val));`,
+                combineLatest: `const { Subject, combineLatest } = rxjs;
+const sourceA$ = new Subject();
+const sourceB$ = new Subject();
+
+combineLatest([sourceA$, sourceB$]).subscribe(([valA, valB]) => {
+    console.log(\`Kết hợp: A - \${valA}, B - \${valB}\`);
+});
+
+// Khi nhấn nút, phát giá trị
+emitButtonA.onclick = () => sourceA$.next('A' + countA++);
+emitButtonB.onclick = () => sourceB$.next('B' + countB++);`,
+                forkJoin: `const { timer, forkJoin } = rxjs;
+const { map } = rxjs.operators;
+
+// Giả lập 2 cuộc gọi API với thời gian khác nhau
+const api1$ = timer(1500).pipe(map(() => 'Dữ liệu User'));
+const api2$ = timer(2500).pipe(map(() => 'Cài đặt User'));
+
+// forkJoin sẽ chờ cả hai hoàn thành
+forkJoin({ 
+    user: api1$, 
+    prefs: api2$ 
+}).subscribe(result => {
+    // result sẽ là: { user: 'Dữ liệu User', prefs: 'Cài đặt User' }
+    console.log(result);
+});`,
+                rateLimit: `const { fromEvent } = rxjs;
+const { debounceTime, throttleTime, tap } = rxjs.operators;
+const click$ = fromEvent(clickButton, 'click');
+
+// DEBOUNCE: Chỉ phát khi người dùng ngừng click 1s
+click$.pipe(
+    debounceTime(1000)
+).subscribe(() => console.log('DEBOUNCE phát!'));
+
+// THROTTLE: Phát lần click đầu tiên, sau đó chờ 1s mới phát tiếp
+click$.pipe(
+    throttleTime(1000)
+).subscribe(() => console.log('THROTTLE phát!'));`,
+                bufferTime: `const { fromEvent, bufferTime } = rxjs;
+const click$ = fromEvent(clickButton, 'click');
+
+// Gom các lần click trong khoảng 2 giây và phát ra như một mảng
+click$.pipe(
+    bufferTime(2000)
+).subscribe(clickArray => {
+    if(clickArray.length > 0) {
+        console.log(\`Đã gom được \${clickArray.length} clicks.\`);
+    }
+});`,
+                pairwise: `const { interval, take, pairwise } = rxjs;
+interval(1000).pipe(
+    take(5), // -> 0, 1, 2, 3, 4
+    pairwise()
+).subscribe(pair => {
+    // -> [0,1], [1,2], [2,3], [3,4]
+    console.log('Cặp giá trị:', pair);
+});`,
+                withLatestFrom: `const { fromEvent, interval, map, withLatestFrom } = rxjs;
+const click$ = fromEvent(clickButton, 'click');
+const timer$ = interval(1500); // Phát 0, 1, 2,... mỗi 1.5s
+
+click$.pipe(
+    // Khi click, lấy giá trị của lần click
+    // và kết hợp nó với giá trị MỚI NHẤT từ timer$
+    withLatestFrom(timer$)
+).subscribe(([clickEvent, timerValue]) => {
+    console.log(\`Click! Giá trị timer lúc đó là: \${timerValue}\`);
+});`,
+                take: `const { interval, take, tap } = rxjs;
+const count = 3; // Lấy từ input
+
+interval(500).pipe(
+    tap(val => console.log('Input:', val + 1)),
+    take(count) // Chỉ lấy 'count' giá trị đầu tiên rồi complete
+).subscribe({
+    next: val => console.log('Output:', val + 1),
+    complete: () => console.log('Hoàn thành!')
+});`,
+                zip: `const { Subject, zip } = rxjs;
+const streamA$ = new Subject(); // Phát số
+const streamB$ = new Subject(); // Phát chữ
+
+// Ghép cặp giá trị từ 2 stream theo thứ tự 1-1
+zip(streamA$, streamB$).subscribe(([num, char]) => {
+    console.log(\`Ghép cặp: \${num} và \${char}\`);
+});
+
+// Phát giá trị
+streamA$.next(1); // Chờ...
+streamB$.next('A'); // Output: Ghép cặp: 1 và A
+
+streamA$.next(2); // Chờ...
+streamB$.next('B'); // Output: Ghép cặp: 2 và B`,
+                catchError: `const { Observable, of } = rxjs;
+const { catchError } = rxjs.operators;
+
+// Luồng này sẽ phát lỗi
+const source$ = new Observable(sub => {
+    sub.next(1);
+    sub.next(2);
+    sub.error('BÙM!');
+});
+
+source$.pipe(
+    // Bắt lỗi và trả về một luồng thay thế
+    catchError(err => {
+        console.log('Đã bắt lỗi:', err);
+        return of('Giá trị thay thế'); // Trả về Observable mới
+    })
+).subscribe(val => console.log('Observer nhận:', val));`,
+                startWith: `const { of, delay, concatMap, startWith } = rxjs;
+const source$ = of(1, 2, 3).pipe(
+    concatMap(val => of(val).pipe(delay(500))) // Giả lập luồng có độ trễ
+);
+
+source$.pipe(
+    // Thêm các giá trị này vào ĐẦU luồng một cách đồng bộ
+    startWith('Bắt đầu!', 0)
+).subscribe(val => console.log(val));
+// Output: 'Bắt đầu!', 0, (sau 0.5s) 1, (sau 0.5s) 2, (sau 0.5s) 3`,
+                subject: `const { Subject } = rxjs;
+const subject = new Subject();
+
+// Sub1 đăng ký trước
+const sub1 = subject.subscribe(val => console.log(\`Sub1 nhận: \${val}\`));
+
+subject.next(1); // Sub1 nhận: 1
+subject.next(2); // Sub1 nhận: 2
+
+// Sub2 đăng ký sau
+const sub2 = subject.subscribe(val => console.log(\`Sub2 nhận: \${val}\`));
+
+subject.next(3); // Sub1 nhận: 3, Sub2 nhận: 3`,
+                behaviorSubject: `const { BehaviorSubject } = rxjs;
+// Khởi tạo với giá trị ban đầu là 'Khánh'
+const subject = new BehaviorSubject('Khánh');
+
+const sub1 = subject.subscribe(val => console.log(\`Sub1 nhận: \${val}\`));
+// Output ngay lập tức: Sub1 nhận: Khánh
+
+subject.next('Đẹp'); // Sub1 nhận: Đẹp
+subject.next('Trai'); // Sub1 nhận: Trai
+
+// Sub2 đăng ký sau, sẽ nhận ngay giá trị cuối cùng ('Trai')
+const sub2 = subject.subscribe(val => console.log(\`Sub2 nhận: \${val}\`));
+// Output ngay lập tức: Sub2 nhận: Trai`,
+                replaySubject: `const { ReplaySubject } = rxjs;
+// Lưu và phát lại 2 giá trị cuối cùng
+const subject = new ReplaySubject(2);
+
+subject.next(1);
+subject.next(2);
+subject.next(3); // Các giá trị hiện có: 2, 3
+
+const sub1 = subject.subscribe(val => console.log(\`Sub1 nhận: \${val}\`));
+// Output ngay lập tức: Sub1 nhận: 2, Sub1 nhận: 3
+
+subject.next(4); // Sub1 nhận: 4
+
+// Sub2 đăng ký, sẽ nhận lại 2 giá trị cuối cùng là 3 và 4
+const sub2 = subject.subscribe(val => console.log(\`Sub2 nhận: \${val}\`));
+// Output ngay lập tức: Sub2 nhận: 3, Sub2 nhận: 4`,
+                typeahead: `const { fromEvent, timer, of } = rxjs;
+const { map, debounceTime, distinctUntilChanged, switchMap, tap } = rxjs.operators;
+
+const input = document.getElementById('typeaheadInput');
+const resultsEl = document.getElementById('typeaheadResult');
+
+const fakeApiSearch = (term) => timer(500).pipe(map(() => \`Kết quả cho '\${term}'\`));
+
+fromEvent(input, 'input').pipe(
+    map(event => event.target.value),
+    debounceTime(400), // Chờ người dùng ngừng gõ 400ms
+    distinctUntilChanged(), // Chỉ tìm kiếm nếu giá trị thay đổi
+    tap(() => resultsEl.innerHTML = 'Đang tìm kiếm...'),
+    // Hủy request cũ và thực hiện request mới
+    switchMap(term => term ? fakeApiSearch(term) : of('Gõ để tìm kiếm'))
+).subscribe(result => resultsEl.textContent = result);`,
+                progressBar: `const { fromEvent, interval, take, finalize, tap } = rxjs;
+const { exhaustMap } = rxjs.operators;
+
+const startBtn = document.getElementById('startProgressBar');
+const progressFill = document.getElementById('progressFill');
+
+const startClick$ = fromEvent(startBtn, 'click');
+
+startClick$.pipe(
+    exhaustMap(() => {
+        startBtn.disabled = true;
+        return interval(40).pipe(
+            take(101),
+            tap(percentage => {
+                progressFill.style.width = \`\${percentage}%\`;
+            }),
+            finalize(() => {
+                startBtn.disabled = false;
+            })
+        );
+    })
+).subscribe();`,
+                formValidation: `const { fromEvent, combineLatest, timer, of } = rxjs;
+const { map, startWith, debounceTime, distinctUntilChanged, switchMap, shareReplay } = rxjs.operators;
+
+// Helper tạo stream xác thực cho một input
+const createValidationStream = (inputEl, validationFn) => fromEvent(inputEl, 'input').pipe(
+    map(event => event.target.value),
+    startWith(inputEl.value || ''),
+    debounceTime(300),
+    distinctUntilChanged(),
+    switchMap(validationFn),
+    shareReplay(1) // Cache kết quả cuối để các stream khác không cần tính lại
+);
+
+// Stream cho từng input
+const username$ = createValidationStream(...);
+const email$ = createValidationStream(...);
+const password$ = createValidationStream(...);
+
+// Kết hợp trạng thái của cả 3 stream
+const formValid$ = combineLatest(
+    [username$, email$, password$]
+).pipe(
+    map(([user, email, pass]) => user.valid && email.valid && pass.valid)
+);
+
+// Cập nhật UI dựa trên trạng thái form
+formValid$.subscribe(isValid => {
+    submitBtn.disabled = !isValid;
+});`,
+                advancedSearch: `const { fromEvent, timer, of, EMPTY } = rxjs;
+const { map, tap, debounceTime, distinctUntilChanged, switchMap, startWith, catchError } = rxjs.operators;
+
+const fakeApiCall = (query) => timer(1000).pipe(map(() => { 
+    if (query.toLowerCase() === 'error') throw new Error('API cố tình lỗi!'); 
+    return \`Kết quả cho '\${query}'\`; 
+}));
+
+fromEvent(searchInput, 'input').pipe(
+    map(event => event.target.value),
+    debounceTime(500), 
+    distinctUntilChanged(),
+    switchMap(query => {
+        if (!query.trim()) return EMPTY; // Không làm gì nếu input rỗng
+        
+        return fakeApiCall(query).pipe(
+            startWith('Đang tải...'), // Hiển thị trạng thái loading ngay lập tức
+            catchError(err => of(\`Lỗi: \${err.message}\`)) // Xử lý lỗi
+        );
+    })
+).subscribe(result => {
+    // Cập nhật UI
+    console.log(result);
+});`,
+                dragDrop: `const { fromEvent, takeUntil, exhaustMap, map, tap } = rxjs;
+
+const mouseDown$ = fromEvent(draggableBox, 'mousedown');
+const mouseMove$ = fromEvent(document, 'mousemove');
+const mouseUp$ = fromEvent(document, 'mouseup');
+
+mouseDown$.pipe(
+    tap(e => e.preventDefault()),
+    // exhaustMap để bỏ qua các lần nhấn chuột khi đang kéo
+    exhaustMap(downEvent => {
+        const startX = draggableBox.offsetLeft;
+        const startY = draggableBox.offsetTop;
+        
+        // Lấy stream các vị trí di chuột
+        return mouseMove$.pipe(
+            map(moveEvent => ({
+                x: startX + (moveEvent.clientX - downEvent.clientX),
+                y: startY + (moveEvent.clientY - downEvent.clientY)
+            })),
+            // Dừng lắng nghe khi nhả chuột
+            takeUntil(mouseUp$)
+        );
+    })
+).subscribe(pos => {
+    // Cập nhật vị trí của box
+    draggableBox.style.left = \`\${pos.x}px\`;
+    draggableBox.style.top = \`\${pos.y}px\`;
+});`,
+                polling: `const { fromEvent, timer, switchMap, takeUntil, tap, map } = rxjs;
+const start$ = fromEvent(startBtn, 'click');
+const stop$ = fromEvent(stopBtn, 'click');
+const fetchData = () => timer(500).pipe(map(() => \`Data \${new Date().toLocaleTimeString()}\`));
+
+start$.pipe(
+    tap(() => { startBtn.disabled = true; stopBtn.disabled = false; }),
+    // switchMap để bắt đầu một chu kỳ polling mới mỗi khi nhấn start
+    switchMap(() => 
+        // timer(0, 3000) phát ngay lập tức, và sau đó mỗi 3 giây
+        timer(0, 3000).pipe(
+            switchMap(fetchData),
+            // takeUntil sẽ dừng polling khi stop$ phát ra giá trị
+            takeUntil(stop$.pipe(tap(() => { startBtn.disabled = false; stopBtn.disabled = true; })))
+        )
+    )
+).subscribe(data => console.log(data));`,
+                multiApiSearch: `const { fromEvent, forkJoin, timer, of } = rxjs;
+const { map, filter, debounceTime, distinctUntilChanged, switchMap, tap, catchError } = rxjs.operators;
+
+const fakeApi1 = (q) => timer(600).pipe(map(() => [\`API1:\${q}-A\`]));
+const fakeApi2 = (q) => timer(1000).pipe(map(() => [\`API2:\${q}-X\`]));
+
+fromEvent(searchInput, 'input').pipe(
+    map(event => event.target.value),
+    debounceTime(700),
+    distinctUntilChanged(),
+    filter(q => q.length > 1),
+    switchMap(q => 
+        forkJoin([ fakeApi1(q), fakeApi2(q) ]).pipe(
+            map(results => results.flat()), // Gộp kết quả từ 2 API
+            catchError(() => of(['Lỗi API']))
+        )
+    )
+).subscribe(results => console.log('Kết quả gộp:', results));`,
+                sequentialTasks: `const { of, concat, defer, throwError, timer } = rxjs;
+const { delay, tap, retry, catchError, mergeMap, map, finalize } = rxjs.operators;
+
+const task1$ = of('1. Xác thực').pipe(delay(800), tap(msg => logTo(logger, msg)));
+// defer để logic thử lại được thực thi mỗi lần retry
+const task2$ = defer(() => {
+    logTo(logger, 'Đang thử gọi API...');
+    if (Math.random() > 0.5) return timer(1000).pipe(map(() => '2. Lấy dữ liệu OK'));
+    return timer(1000).pipe(mergeMap(() => throwError(() => 'Lỗi mạng')));
+}).pipe(
+    retry(1), // Thử lại 1 lần nếu lỗi
+    tap(msg => logTo(logger, msg)),
+    catchError((err) => {
+        logTo(logger, \`Lỗi sau khi thử lại: \${err}\`, true);
+        return of('2. Lấy dữ liệu thất bại');
+    })
+);
+const task3$ = of('3. Hiển thị').pipe(delay(600), tap(msg => logTo(logger, msg)));
+
+// concat đảm bảo các tác vụ chạy tuần tự
+concat(task1$, task2$, task3$)
+.pipe(finalize(() => logTo(logger, '--- Hoàn thành chuỗi ---')))
+.subscribe();`,
+                infiniteScroll: `const { fromEvent, exhaustMap, filter, debounceTime, finalize, timer, map } = rxjs;
+
+const scroll$ = fromEvent(scrollContainer, 'scroll');
+
+function fetchItems(page) {
+    isLoading = true;
+    return timer(1000).pipe(
+        map(() => Array.from({length: 7}, (_, i) => \`Item \${page * 7 + i + 1}\`)),
+        finalize(() => { isLoading = false; })
+    );
+}
+
+const loadMore$ = scroll$.pipe(
+    filter(() => !isLoading && (container.scrollTop + container.clientHeight >= container.scrollHeight - 100)),
+    debounceTime(200)
+);
+
+loadMore$.pipe(
+    exhaustMap(() => fetchItems(currentPage++))
+).subscribe(newItems => {
+    // Thêm item vào UI
+});`,
+                autosave: `const { fromEvent, timer } = rxjs;
+const { map, tap, debounceTime, distinctUntilChanged, switchMap, catchError } = rxjs.operators;
+const textarea = document.getElementById('autosaveTextarea');
+const statusEl = document.getElementById('autosaveStatus');
+const fakeSaveApi = (content) => timer(1000).pipe(
+    map(() => \`Đã lưu: "\${content.substring(0, 20)}..."\`)
+);
+fromEvent(textarea, 'input').pipe(
+    map(event => event.target.value),
+    tap(() => statusEl.textContent = 'Đang gõ...'),
+    debounceTime(1500),
+    distinctUntilChanged(),
+    tap(() => statusEl.textContent = 'Đang lưu...'),
+    switchMap(content => fakeSaveApi(content).pipe(
+        catchError(() => {
+            statusEl.textContent = 'Lỗi lưu!';
+            return EMPTY; // Không phát gì nếu lỗi
+        })
+    ))
+).subscribe(result => {
+    statusEl.textContent = 'Đã lưu!';
+    logTo(document.getElementById('autosaveLogger'), result);
+});`,
+                websocket: `const { webSocket } = rxjs.webSocket;
+const { retry } = rxjs.operators;
+const WS_URL = 'wss://socketsbay.com/wss/v2/1/demo/';
+let wsSubject;
+
+function connect() {
+    // Tạo WebSocket subject
+    wsSubject = webSocket({
+        url: WS_URL,
+        openObserver: { next: () => console.log('Đã kết nối!') },
+        closeObserver: { next: () => console.log('Đã ngắt kết nối.') }
+    });
+    // Subscribe để lắng nghe tin nhắn đến
+    // Tự động kết nối lại 5 lần, mỗi lần cách nhau 2s nếu có lỗi
+    wsSubject.pipe(
+        retry({ count: 5, delay: 2000 })
+    ).subscribe(
+        msg => console.log('Nhận:', msg),
+        err => console.error('Lỗi:', err)
+    );
+}
+function sendMessage(message) {
+    wsSubject.next({ message: message });
+}
+function disconnect() {
+    wsSubject.complete(); // Đóng kết nối
+}`
+            };
+            
+            // --- App Logic (Search, Code Toggle, Copy) ---
+            function setupAppFeatures() {
+                // 1. Inject code snippets and highlight
+                document.querySelectorAll('[data-code-id]').forEach(el => {
+                    const codeId = el.dataset.codeId;
+                    if (codeSnippets[codeId]) {
+                        el.textContent = codeSnippets[codeId].trim();
+                    }
+                });
+                hljs.highlightAll();
+
+                // 2. Search logic
+                const searchInput = document.getElementById('searchInput');
+                const allDemos = document.querySelectorAll('.interactive-demo');
+                if(searchInput) {
+                    fromEvent(searchInput, 'input').pipe(
+                        debounceTime(300),
+                        map(event => event.target.value.toLowerCase().trim()),
+                        distinctUntilChanged(),
+                    ).subscribe(searchTerm => {
+                        let isFirstVisibleDemo = true;
+                        let visibleSections = new Set();
+
+                        allDemos.forEach(demo => {
+                            const searchTerms = (demo.dataset.searchTerms || '').toLowerCase();
+                            const title = demo.querySelector('h3').textContent.toLowerCase();
+                            const isVisible = searchTerm === '' || searchTerms.includes(searchTerm) || title.includes(searchTerm);
+                            
+                            demo.style.display = isVisible ? '' : 'none';
+
+                             if(isVisible) {
+                                const section = demo.closest('.content-section');
+                                if(section) visibleSections.add(section.id);
+                            }
+                        });
+
+                        contentSections.forEach(section => {
+                             section.style.display = visibleSections.has(section.id) ? 'block' : 'none';
+                        });
+
+                        if (searchTerm === '') {
+                             const activeNav = document.querySelector('.nav-button.active');
+                             if (activeNav) {
+                                contentSections.forEach(section => {
+                                    section.style.display = section.id === activeNav.dataset.section ? 'block' : 'none';
+                                });
+                            }
+                        }
+                    });
+                }
+                
+                // 3. Event delegation for "View Code" and "Copy" buttons
+                document.body.addEventListener('click', event => {
+                    // Toggle Code
+                    if (event.target.classList.contains('toggle-code-btn')) {
+                        const btn = event.target;
+                        const demo = btn.closest('.interactive-demo');
+                        if(demo) {
+                           const wrapper = demo.querySelector('.code-block-wrapper');
+                           if(wrapper) {
+                               wrapper.classList.toggle('show');
+                               btn.textContent = wrapper.classList.contains('show') ? 'Ẩn Code' : 'Xem Code';
+                           }
+                        }
+                    }
+                    // Copy Code
+                    if (event.target.classList.contains('copy-code-btn')) {
+                        const btn = event.target;
+                        const pre = btn.previousElementSibling;
+                        if(pre && pre.tagName === 'PRE') {
+                            const code = pre.querySelector('code').textContent;
+                            navigator.clipboard.writeText(code).then(() => {
+                                const originalText = 'Copy';
+                                btn.textContent = 'Đã chép!';
+                                btn.classList.add('copied');
+                                setTimeout(() => {
+                                    btn.textContent = originalText;
+                                    btn.classList.remove('copied');
+                                }, 2000);
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // --- Confetti effect ---
+            function createConfetti() {
+                const container = document.getElementById('confetti-container');
+                const dropZoneEl = document.getElementById('dropZone');
+                if (!container || !dropZoneEl) return;
+                const colors = ['#2563eb', '#22c55e', '#f59e0b', '#ef4444', '#9b59b6'];
+                const dropZoneRect = dropZoneEl.getBoundingClientRect();
+
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'absolute';
+                    confetti.style.width = `${Math.random() * 8 + 4}px`;
+                    confetti.style.height = confetti.style.width;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    const startX = dropZoneRect.left + dropZoneRect.width / 2;
+                    const startY = dropZoneRect.top + dropZoneRect.height / 2;
+                    confetti.style.left = `${startX}px`;
+                    confetti.style.top = `${startY}px`;
+                    confetti.style.opacity = '1';
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = Math.random() * 200 + 150;
+                    const endX = Math.cos(angle) * velocity;
+                    const endY = Math.sin(angle) * velocity;
+
+                    const anim = confetti.animate([
+                        { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                        { transform: `translate(${endX}px, ${endY}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                    ], {
+                        duration: Math.random() * 1000 + 800,
+                        easing: 'cubic-bezier(0.1, 0.9, 0.2, 1)',
+                    });
+                    anim.onfinish = () => confetti.remove();
+                    container.appendChild(confetti);
+                }
+            }
+
+            // --- Navigation ---
+            navButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const sectionId = button.dataset.section;
+                    // Reset search
+                    document.getElementById('searchInput').value = ''; 
+                    allDemos.forEach(d => d.style.display = '');
+
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    contentSections.forEach(section => {
+                        section.style.display = 'none';
+                        section.classList.remove('active');
+                        if (section.id === sectionId) {
+                            section.style.display = 'block';
+                            section.classList.add('active');
+                        }
+                    });
+                    
+                     const targetSection = document.getElementById(sectionId);
+                     if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                     }
+                });
+            });
+            
+            // --- Helper functions ---
+            function addMarble(containerElement, value, isOutput = false, customDelay = 0, color = null, specialClass = null) {
+                if (!containerElement) return null;
+                const marble = document.createElement('div');
+                marble.classList.add('marble');
+                if (specialClass) marble.classList.add(specialClass);
+                if (color) { marble.style.backgroundColor = color; } 
+                else if (isOutput) { marble.style.backgroundColor = '#2ecc71';}
+                
+                let displayValue = String(value);
+
+                if (specialClass === 'complete') {
+                    displayValue = '';
+                } else if (Array.isArray(value)) { 
+                    displayValue = `[${value.map(v => String(v).length > 7 ? String(v).substring(0,5)+'..' : v).join(',')}]`; 
+                } else if (typeof value === 'object' && value !== null && value.message) { 
+                    displayValue = `X`;
+                    marble.classList.add('error');
+                } else if (value === 'Đang tải...' || (typeof value === 'string' && value.startsWith('LOAD P'))) { 
+                    marble.classList.add('loading'); 
+                }
+                
+                if (displayValue.length > 20 && !Array.isArray(value)) displayValue = displayValue.substring(0,17)+'..';
+                marble.textContent = displayValue; 
+                
+                const existingMarbles = containerElement.querySelectorAll('.marble').length;
+                marble.style.animationDelay = `${customDelay || (existingMarbles * 100)}ms`;
+                containerElement.appendChild(marble);
+                
+                return marble; 
+            }
+            
+            function addCompletionMarble(containerElement, delay = 0) { 
+                if (!containerElement) return; 
+                addMarble(containerElement, '', false, delay, '#7f8c8d', 'complete'); 
+            }
+            
+            function clearStream(...elements) { 
+                 elements.forEach(el => { if (el) el.innerHTML = ''; });
+            }
+            
+            function logTo(element, message, isError = false) {
+                if (!element) return;
+                const p = document.createElement('p');
+                const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 2 });
+                p.textContent = `[${timestamp}] ${message}`;
+                if (isError) p.style.color = '#dc2626';
+                element.appendChild(p); 
+                element.scrollTop = element.scrollHeight; 
+            }
+
+            const subscriptions = new Map();
+            function manageSub(key, sub) {
+                if (subscriptions.has(key)) {
+                    subscriptions.get(key).unsubscribe();
+                }
+                subscriptions.set(key, sub);
+            }
+            function cleanupSub(key) {
+                 if (subscriptions.has(key)) {
+                    subscriptions.get(key).unsubscribe();
+                    subscriptions.delete(key);
+                }
+            }
+
+            // --- Initialize all demos ---
+            const allDemos = document.querySelectorAll('.interactive-demo');
+            setupAppFeatures();
+
+            // --- Section 1: Intro ---
+            const firstObserverOutputEl = document.getElementById('firstObserverOutput');
+            function resetFirstObservable() {
+                cleanupSub('first');
+                clearStream(document.getElementById('firstObservableStream'), firstObserverOutputEl);
+            }
+            document.getElementById('runFirstObservable')?.addEventListener('click', () => {
+                resetFirstObservable();
+                logTo(firstObserverOutputEl, 'Bắt đầu subscribe...');
+                const sub = of('A', 'B', 'C').pipe(
+                    concatMap(val => of(val).pipe(delay(300)))
+                ).subscribe({
+                    next: val => {
+                        addMarble(document.getElementById('firstObservableStream'), val, true);
+                        logTo(firstObserverOutputEl, `Nhận giá trị (next): ${val}`);
+                    },
+                    complete: () => {
+                        addCompletionMarble(document.getElementById('firstObservableStream'), 100);
+                        logTo(firstObserverOutputEl, 'Đã hoàn thành (complete)!');
+                    }
+                });
+                manageSub('first', sub);
+            });
+            document.getElementById('resetFirstObservable')?.addEventListener('click', resetFirstObservable);
+
+
+            // --- Section 2: Basic Operators ---
+            function setupBasicOperatorDemo(key, runBtnId, resetBtnId, inStreamId, outStreamId, logId, source$, operatorsFn) {
+                const runBtn = document.getElementById(runBtnId);
+                const resetBtn = document.getElementById(resetBtnId);
+                const inEl = document.getElementById(inStreamId);
+                const outEl = document.getElementById(outStreamId);
+                const logEl = document.getElementById(logId);
+
+                function reset() {
+                    cleanupSub(key);
+                    clearStream(inEl, outEl, logEl);
+                }
+                
+                function run() {
+                    reset();
+                    logTo(logEl, 'Bắt đầu luồng...');
+                    const sub = source$.pipe(...operatorsFn(logEl)).subscribe({
+                        next: val => addMarble(outEl, val, true),
+                        complete: () => {
+                            addCompletionMarble(inEl, 100);
+                            addCompletionMarble(outEl, 100);
+                            logTo(logEl, '--- Luồng hoàn thành ---');
+                        }
+                    });
+                    manageSub(key, sub);
+                }
+                runBtn?.addEventListener('click', run);
+                resetBtn?.addEventListener('click', reset);
+            }
+            
+            setupBasicOperatorDemo('map', 'runMapOperator', 'resetMapOperator', 'mapInputStream', 'mapOutputStream', 'mapLoggerOutput', 
+                interval(500).pipe(take(3), map(i => i + 1)),
+                (logEl) => [
+                    tap(val => { addMarble(document.getElementById('mapInputStream'), val, false); logTo(logEl, `Input: ${val}`); }),
+                    map(val => val * 10),
+                    tap(val => logTo(logEl, `Output: ${val}`))
+                ]
+            );
+            
+            setupBasicOperatorDemo('filter', 'runFilterOperator', 'resetFilterOperator', 'filterInputStream', 'filterOutputStream', 'filterLoggerOutput', 
+                interval(500).pipe(take(5), map(i => i + 1)),
+                (logEl) => [
+                    tap(val => { addMarble(document.getElementById('filterInputStream'), val, false); logTo(logEl, `Input: ${val}`); }),
+                    filter(val => val % 2 === 0),
+                    tap(val => logTo(logEl, `Passed filter: ${val}`))
+                ]
+            );
+
+            setupBasicOperatorDemo('tap', 'runTapOperator', 'resetTapOperator', 'tapInputStream', 'tapOutputStream', 'tapLoggerOutput', 
+                interval(500).pipe(take(3), map(i => String.fromCharCode(65 + i))),
+                (logEl) => [
+                    tap(val => {
+                        addMarble(document.getElementById('tapInputStream'), val, false);
+                        logTo(logEl, `TAP đã thấy: ${val}`);
+                    })
+                ]
+            );
+
+            setupBasicOperatorDemo('scan', 'runScanOperator', 'resetScanOperator', 'scanInputStream', 'scanOutputStream', 'scanLoggerOutput',
+                interval(500).pipe(take(4), map(i => i + 1)),
+                (logEl) => [
+                     tap(val => { addMarble(document.getElementById('scanInputStream'), val, false); logTo(logEl, `Input: ${val}`); }),
+                     scan((acc, curr) => acc + curr, 0),
+                     tap(val => logTo(logEl, `Tổng tích lũy: ${val}`))
+                ]
+            );
+
+            // --- Section 3: Flattening Operators ---
+            function setupFlatteningDemo(opName, btnId, resetBtnId, inStreamId, outStreamId, logId, operator) {
+                const runBtn = document.getElementById(btnId);
+                const resetBtn = document.getElementById(resetBtnId);
+                const inEl = document.getElementById(inStreamId);
+                const outEl = document.getElementById(outStreamId);
+                const logEl = document.getElementById(logId);
+                
+                let outerCounter = 0;
+                const colors = ['#1abc9c', '#3498db', '#9b59b6', '#f1c40f', '#e67e22'];
+                
+                function setupStream() {
+                    cleanupSub(opName);
+                    logTo(logEl, 'Sẵn sàng lắng nghe click...');
+                    const clicks$ = fromEvent(runBtn, 'click');
+
+                    const sub = clicks$.pipe(
+                        map(() => {
+                            const count = outerCounter++;
+                            const color = colors[count % colors.length];
+                            logTo(logEl, `Click #${count} -> Tạo luồng con...`);
+                            addMarble(inEl, `Click ${count}`, false, 0, color);
+                            return interval(600).pipe(
+                                take(3),
+                                map(i => ({ val: `${count}.${i}`, color: color })),
+                                finalize(() => {
+                                    addCompletionMarble(outEl, 100);
+                                    logTo(logEl, `Luồng con của Click #${count} hoàn thành.`);
+                                })
+                            );
+                        }),
+                        operator(logEl)
+                    ).subscribe(res => {
+                        addMarble(outEl, res.val, true, 0, res.color);
+                        logTo(logEl, `Output: ${res.val}`);
+                    });
+                    manageSub(opName, sub);
+                }
+                
+                function reset() {
+                    cleanupSub(opName);
+                    clearStream(inEl, outEl, logEl);
+                    outerCounter = 0;
+                    setupStream();
+                }
+                
+                setupStream();
+                resetBtn?.addEventListener('click', reset);
+            }
+            
+            setupFlatteningDemo('mergeMap', 'runMergeMap', 'resetMergeMap', 'mergeMapInputStream', 'mergeMapOutputStream', 'mergeMapLoggerOutput', (logEl) => mergeMap(inner$ => inner$));
+            setupFlatteningDemo('switchMap', 'runSwitchMap', 'resetSwitchMap', 'switchMapInputStream', 'switchMapOutputStream', 'switchMapLoggerOutput', (logEl) => switchMap(inner$ => inner$.pipe(tap({ unsubscribe: () => logTo(logEl, 'Luồng con cũ bị hủy!', true) }))));
+            setupFlatteningDemo('concatMap', 'runConcatMap', 'resetConcatMap', 'concatMapInputStream', 'concatMapOutputStream', 'concatMapLoggerOutput', (logEl) => concatMap(inner$ => inner$));
+            setupFlatteningDemo('exhaustMap', 'runExhaustMap', 'resetExhaustMap', 'exhaustMapInputStream', 'exhaustMapOutputStream', 'exhaustMapLoggerOutput', (logEl) => exhaustMap(inner$ => inner$));
+            
+            // --- Section 4: Combination Operators ---
+            const combineSourceAEl = document.getElementById('combineSourceAStream');
+            const combineSourceBEl = document.getElementById('combineSourceBStream');
+            const combineOutputEl = document.getElementById('combineOutputStream');
+            const combineLoggerEl = document.getElementById('combineLoggerOutput');
+            let combineSourceA$, combineSourceB$;
+            let countA = 0, countB = 0;
+
+            function resetCombine() {
+                cleanupSub('combine');
+                if (combineSourceA$) combineSourceA$.complete();
+                if (combineSourceB$) combineSourceB$.complete();
+                clearStream(combineSourceAEl, combineSourceBEl, combineOutputEl, combineLoggerEl);
+                countA = 0;
+                countB = 0;
+                runCombine();
+            }
+            function runCombine() {
+                combineSourceA$ = new Subject();
+                combineSourceB$ = new Subject();
+                logTo(combineLoggerEl, 'Đang chờ cả 2 luồng phát giá trị lần đầu...');
+                const sub = combineLatest([combineSourceA$, combineSourceB$]).subscribe(([valA, valB]) => {
+                    logTo(combineLoggerEl, `Kết hợp: A=${valA}, B=${valB}`);
+                    addMarble(combineOutputEl, [valA, valB], true);
+                });
+                manageSub('combine', sub);
+            }
+            document.getElementById('emitSourceACombine')?.addEventListener('click', () => {
+                const val = `A${++countA}`;
+                combineSourceA$.next(val);
+                addMarble(combineSourceAEl, val, false, 0, '#9b59b6');
+                logTo(combineLoggerEl, `Stream A phát: ${val}`);
+            });
+            document.getElementById('emitSourceBCombine')?.addEventListener('click', () => {
+                 const val = `B${++countB}`;
+                combineSourceB$.next(val);
+                addMarble(combineSourceBEl, val, false, 0, '#e67e22');
+                logTo(combineLoggerEl, `Stream B phát: ${val}`);
+            });
+            document.getElementById('resetCombine')?.addEventListener('click', resetCombine);
+            runCombine();
+
+            const forkJoinLoggerEl = document.getElementById('forkJoinLoggerOutput');
+            function resetForkJoin() {
+                cleanupSub('forkJoin');
+                clearStream(document.getElementById('forkJoinSource1Stream'), document.getElementById('forkJoinSource2Stream'), document.getElementById('forkJoinOutputStream'), forkJoinLoggerEl);
+            }
+            document.getElementById('runForkJoin')?.addEventListener('click', () => {
+                resetForkJoin();
+                logTo(forkJoinLoggerEl, 'Bắt đầu gọi 2 API song song...');
+                addMarble(document.getElementById('forkJoinSource1Stream'), 'loading', false, 0, null, 'loading');
+                addMarble(document.getElementById('forkJoinSource2Stream'), 'loading', false, 0, null, 'loading');
+
+                const api1$ = timer(1500).pipe(map(() => 'User Data'), tap(v => { logTo(forkJoinLoggerEl, 'API 1 hoàn thành.'); clearStream(document.getElementById('forkJoinSource1Stream')); addMarble(document.getElementById('forkJoinSource1Stream'), v, false, 0, '#16a085');}));
+                const api2$ = timer(2500).pipe(map(() => 'User Prefs'), tap(v => { logTo(forkJoinLoggerEl, 'API 2 hoàn thành.'); clearStream(document.getElementById('forkJoinSource2Stream')); addMarble(document.getElementById('forkJoinSource2Stream'), v, false, 0, '#27ae60');}));
+
+                const sub = forkJoin({ api1: api1$, api2: api2$ }).subscribe(result => {
+                    logTo(forkJoinLoggerEl, `forkJoin phát kết quả: ${JSON.stringify(result)}`);
+                    addMarble(document.getElementById('forkJoinOutputStream'), Object.values(result), true);
+                });
+                manageSub('forkJoin', sub);
+            });
+            document.getElementById('resetForkJoin')?.addEventListener('click', resetForkJoin);
+            
+            // --- Section 5: Utility Operators ---
+            const rateLimitLoggerEl = document.getElementById('rateLimitLoggerOutput');
+            function resetRateLimit() {
+                cleanupSub('rateLimit');
+                clearStream(document.getElementById('rateLimitInputStream'), document.getElementById('debounceOutputStream'), document.getElementById('throttleOutputStream'), rateLimitLoggerEl);
+            }
+            document.getElementById('runRateLimit')?.addEventListener('click', () => {
+                resetRateLimit();
+                logTo(rateLimitLoggerEl, 'Bắt đầu lắng nghe click...');
+                const click$ = fromEvent(document.getElementById('runRateLimit'), 'click');
+                const sharedClick$ = click$.pipe(
+                    tap(() => {
+                        addMarble(document.getElementById('rateLimitInputStream'), 'Click', false, 0, '#f39c12');
+                        logTo(rateLimitLoggerEl, 'Input: Click');
+                    }),
+                    shareReplay()
+                );
+                
+                const sub1 = sharedClick$.pipe(debounceTime(1000)).subscribe(() => {
+                    addMarble(document.getElementById('debounceOutputStream'), 'Emit', true, 0, '#9b59b6');
+                    logTo(rateLimitLoggerEl, 'Output Debounce: Emit');
+                });
+                 const sub2 = sharedClick$.pipe(throttleTime(1000)).subscribe(() => {
+                    addMarble(document.getElementById('throttleOutputStream'), 'Emit', true, 0, '#3498db');
+                    logTo(rateLimitLoggerEl, 'Output Throttle: Emit');
+                });
+                const sub3 = sharedClick$.subscribe();
+                manageSub('rateLimit', { unsubscribe: () => { sub1.unsubscribe(); sub2.unsubscribe(); sub3.unsubscribe(); } });
+            });
+            document.getElementById('resetRateLimit')?.addEventListener('click', resetRateLimit);
+            
+            const bufferTimeLoggerEl = document.getElementById('bufferTimeLoggerOutput');
+            function resetBufferTime() {
+                cleanupSub('bufferTime');
+                clearStream(document.getElementById('bufferTimeInputStream'), document.getElementById('bufferTimeOutputStream'), bufferTimeLoggerEl);
+            }
+            document.getElementById('runBufferTime')?.addEventListener('click', () => {
+                resetBufferTime();
+                let clickCount = 0;
+                logTo(bufferTimeLoggerEl, 'Bắt đầu lắng nghe click và gom mỗi 2s...');
+                const click$ = fromEvent(document.getElementById('runBufferTime'), 'click').pipe(
+                    map(() => ++clickCount),
+                    tap(val => {
+                        addMarble(document.getElementById('bufferTimeInputStream'), val, false, 0, '#16a085');
+                        logTo(bufferTimeLoggerEl, `Input: ${val}`);
+                    })
+                );
+                const sub = click$.pipe(bufferTime(2000)).subscribe(val => {
+                    if (val.length > 0) {
+                        addMarble(document.getElementById('bufferTimeOutputStream'), val, true);
+                        logTo(bufferTimeLoggerEl, `Output: [${val.join(',')}]`);
+                    }
+                });
+                manageSub('bufferTime', sub);
+            });
+            document.getElementById('resetBufferTime')?.addEventListener('click', resetBufferTime);
+
+            setupBasicOperatorDemo('pairwise', 'runPairwise', 'resetPairwise', 'pairwiseInputStream', 'pairwiseOutputStream', 'pairwiseLoggerOutput',
+                interval(1000).pipe(take(5)),
+                (logEl) => [
+                    tap(val => { addMarble(document.getElementById('pairwiseInputStream'), val, false); logTo(logEl, `Input: ${val}`); }),
+                    pairwise(),
+                    tap(val => logTo(logEl, `Output: [${val.join(',')}]`))
+                ]
+            );
+            
+            const wlfLoggerEl = document.getElementById('wlfLoggerOutput');
+            function resetWithLatestFrom() {
+                 cleanupSub('wlf');
+                 clearStream(document.getElementById('wlfSourceStream'), document.getElementById('wlfOtherStream'), document.getElementById('wlfOutputStream'), wlfLoggerEl);
+            }
+            document.getElementById('runWithLatestFrom')?.addEventListener('click', () => {
+                resetWithLatestFrom();
+                let clickCount = 0;
+                logTo(wlfLoggerEl, 'Timer chạy ngầm, click để lấy giá trị mới nhất.');
+                const click$ = fromEvent(document.getElementById('runWithLatestFrom'), 'click').pipe(
+                    map(() => `C${++clickCount}`),
+                    tap(val => addMarble(document.getElementById('wlfSourceStream'), val, false, 0, '#9b59b6'))
+                );
+                const timer$ = interval(1500).pipe(
+                    map(i => `T${i}`),
+                    tap(val => addMarble(document.getElementById('wlfOtherStream'), val, false, 0, '#e67e22'))
+                );
+                const clickSub = click$.pipe(withLatestFrom(timer$)).subscribe(val => {
+                    addMarble(document.getElementById('wlfOutputStream'), val, true);
+                    logTo(wlfLoggerEl, `Kết hợp: [${val.join(',')}]`);
+                });
+                const timerSub = timer$.subscribe();
+                manageSub('wlf', { unsubscribe: () => { clickSub.unsubscribe(); timerSub.unsubscribe(); }});
+            });
+            document.getElementById('resetWithLatestFrom')?.addEventListener('click', resetWithLatestFrom);
+
+            // --- Section 6: Useful Operators ---
+            const takeLoggerEl = document.getElementById('takeLoggerOutput');
+            function resetTakeOperator() {
+                cleanupSub('take');
+                clearStream(document.getElementById('takeInputStream'), document.getElementById('takeOutputStream'), takeLoggerEl);
+            }
+            document.getElementById('runTakeOperator')?.addEventListener('click', () => {
+                resetTakeOperator();
+                const count = parseInt(document.getElementById('takeCountInput').value) || 3;
+                document.getElementById('takeCountDisplay').textContent = count;
+                logTo(takeLoggerEl, `Lấy ${count} giá trị đầu tiên.`);
+                const sub = interval(500).pipe(
+                    map(i => i + 1),
+                    tap(val => { addMarble(document.getElementById('takeInputStream'), val, false); logTo(takeLoggerEl, `Input: ${val}`); }),
+                    take(count),
+                    tap(val => logTo(takeLoggerEl, `Output: ${val}`))
+                ).subscribe({
+                    next: val => addMarble(document.getElementById('takeOutputStream'), val, true),
+                    complete: () => { 
+                        addCompletionMarble(document.getElementById('takeInputStream'), 100);
+                        addCompletionMarble(document.getElementById('takeOutputStream'), 100);
+                        logTo(takeLoggerEl, '--- Luồng hoàn thành ---');
+                    }
+                });
+                manageSub('take', sub);
+            });
+            document.getElementById('resetTakeOperator')?.addEventListener('click', resetTakeOperator);
+            
+            const zipLoggerEl = document.getElementById('zipLoggerOutput');
+            let zipA$, zipB$;
+            let zipCountA = 0, zipCountB = 64; // ASCII for '@'
+            function resetZip() {
+                cleanupSub('zip');
+                if(zipA$) zipA$.complete();
+                if(zipB$) zipB$.complete();
+                zipCountA = 0; zipCountB = 64;
+                clearStream(document.getElementById('zipSource1Stream'), document.getElementById('zipSource2Stream'), document.getElementById('zipOutputStream'), zipLoggerEl);
+            }
+            function runZip() {
+                resetZip();
+                zipA$ = new Subject();
+                zipB$ = new Subject();
+                logTo(zipLoggerEl, "Sẵn sàng, đang chờ giá trị từ cả 2 luồng.");
+                const sub = zip(zipA$, zipB$).subscribe(([valA, valB]) => { 
+                    addMarble(document.getElementById('zipOutputStream'), [valA, valB], true, 0, '#E67E22'); 
+                    logTo(zipLoggerEl, `Output: [${valA}, ${valB}]`); 
+                });
+                manageSub('zip', sub);
+            }
+            document.getElementById('emitSource1Zip')?.addEventListener('click', () => { 
+                if (!subscriptions.has('zip') || subscriptions.get('zip').closed) runZip();
+                const val = ++zipCountA;
+                zipA$.next(val); 
+                addMarble(document.getElementById('zipSource1Stream'), val, false, 0, '#F1C40F'); 
+                logTo(zipLoggerEl, `Stream A phát: ${val}`);
+            });
+            document.getElementById('emitSource2Zip')?.addEventListener('click', () => { 
+                if (!subscriptions.has('zip') || subscriptions.get('zip').closed) runZip();
+                zipCountB++; if (zipCountB > 90) zipCountB = 65;
+                const char = String.fromCharCode(zipCountB); 
+                zipB$.next(char); 
+                addMarble(document.getElementById('zipSource2Stream'), char, false, 0, '#9B59B6'); 
+                logTo(zipLoggerEl, `Stream B phát: ${char}`);
+            });
+            document.getElementById('resetZipOperator')?.addEventListener('click', resetZip);
+            
+            const catchErrorLoggerEl = document.getElementById('catchErrorLoggerOutput');
+            function resetCatchError() {
+                cleanupSub('catchError');
+                clearStream(document.getElementById('catchErrorInputStream'), document.getElementById('catchErrorOutputStream'), catchErrorLoggerEl);
+            }
+            function runCatchErrorDemo(willError) {
+                resetCatchError();
+                logTo(catchErrorLoggerEl, `Bắt đầu luồng ${willError ? 'sẽ' : 'không'} có lỗi...`);
+                const source$ = new Observable(sub => {
+                    sub.next(1);
+                    setTimeout(() => sub.next(2), 500);
+                    setTimeout(() => willError ? sub.error(new Error('BÙM!')) : (sub.next(3), sub.complete()), 1000);
+                });
+                const sub = source$.pipe(
+                    tap(val => { addMarble(document.getElementById('catchErrorInputStream'), val, false); logTo(catchErrorLoggerEl, `Input: ${val}`); }),
+                    catchError((err, caught) => { 
+                        addMarble(document.getElementById('catchErrorInputStream'), new Error('Lỗi'), false, 0); 
+                        logTo(catchErrorLoggerEl, `Bắt được lỗi: ${err.message}`, true);
+                        addMarble(document.getElementById('catchErrorOutputStream'), 'FIXED!', true, 0, null, 'fallback');
+                        logTo(catchErrorLoggerEl, `Output từ catchError: 'Đã Fix'`);
+                        return of('Đã Fix'); 
+                    })
+                ).subscribe({
+                    next: val => { addMarble(document.getElementById('catchErrorOutputStream'), val, true); logTo(catchErrorLoggerEl, `Observer nhận: ${val}`); },
+                    error: err => addMarble(document.getElementById('catchErrorOutputStream'), new Error('Lỗi Cuối'), true, 0),
+                    complete: () => { addCompletionMarble(document.getElementById('catchErrorOutputStream'), 100); logTo(catchErrorLoggerEl, '--- Luồng hoàn thành ---'); }
+                });
+                manageSub('catchError', sub);
+            }
+            document.getElementById('runCatchErrorStream')?.addEventListener('click', () => runCatchErrorDemo(true));
+            document.getElementById('runCatchErrorStreamNoError')?.addEventListener('click', () => runCatchErrorDemo(false));
+            document.getElementById('resetCatchError')?.addEventListener('click', resetCatchError);
+            
+            const startWithLoggerEl = document.getElementById('startWithLoggerOutput');
+            function resetStartWith() {
+                cleanupSub('startWith');
+                clearStream(document.getElementById('startWithInputStream'), document.getElementById('startWithOutputStream'), startWithLoggerEl);
+            }
+            document.getElementById('runStartWithOperator')?.addEventListener('click', () => {
+                resetStartWith();
+                logTo(startWithLoggerEl, 'Bắt đầu luồng...');
+                const rawValues = document.getElementById('startWithValuesInput').value.split(',').map(s => s.trim()).filter(s => s !== '');
+                const startValues = rawValues.map(s => isNaN(parseFloat(s)) || s.match(/[a-zA-Z]/) ? s : parseFloat(s));
+                document.getElementById('startWithValuesDisplay').textContent = startValues.join(',');
+                
+                const source$ = of(10, 20, 30).pipe(
+                    concatMap(val => of(val).pipe(delay(300))),
+                    tap(val => { addMarble(document.getElementById('startWithInputStream'), val, false, 0, '#FFC300'); logTo(startWithLoggerEl, `Luồng gốc phát: ${val}`); })
+                );
+                
+                const sub = source$.pipe(
+                    delay(1000), 
+                    startWith(...startValues),
+                    tap(val => logTo(startWithLoggerEl, `Output: ${val}`))
+                ).subscribe({
+                    next: val => addMarble(document.getElementById('startWithOutputStream'), val, true, 0),
+                    complete: () => { 
+                        addCompletionMarble(document.getElementById('startWithOutputStream'), 100); 
+                        addCompletionMarble(document.getElementById('startWithInputStream'), 100);
+                        logTo(startWithLoggerEl, '--- Luồng hoàn thành ---');
+                    }
+                });
+                manageSub('startWith', sub);
+            });
+            document.getElementById('resetStartWithOperator')?.addEventListener('click', resetStartWith);
+            
+            // --- Section 7: Subjects ---
+            function setupSubjectDemo(name, runBtnId, emitBtnId, addSub2BtnId, resetBtnId, logElId, sub1OutElId, sub2OutElId, createSubjectFn) {
+                const logEl = document.getElementById(logElId);
+                const sub1OutEl = document.getElementById(sub1OutElId);
+                const sub2OutEl = document.getElementById(sub2OutElId);
+                let subject, sub1, sub2, counter = 0;
+                
+                function reset() {
+                    cleanupSub(`${name}_sub1`);
+                    cleanupSub(`${name}_sub2`);
+                    if(subject) subject.complete();
+                    clearStream(logEl, sub1OutEl, sub2OutEl);
+                    counter = 0; subject = sub1 = sub2 = null;
+                    logTo(logEl, `${name} đã reset.`);
+                }
+                function run() {
+                    reset();
+                    subject = createSubjectFn();
+                    logTo(logEl, `Tạo ${name}. Sub1 đăng ký.`);
+                    sub1 = subject.subscribe(val => { 
+                        addMarble(sub1OutEl, val, false, 0, '#9b59b6'); 
+                        logTo(logEl, `Sub1 nhận: ${val}`); 
+                    });
+                    manageSub(`${name}_sub1`, sub1);
+                }
+                document.getElementById(runBtnId)?.addEventListener('click', run);
+                document.getElementById(emitBtnId)?.addEventListener('click', () => {
+                    if(!subject) { logTo(logEl, `Tạo ${name} trước!`, true); return; } 
+                    counter++; 
+                    const val = (name === 'BehaviorSubject') ? `Value ${counter}` : counter;
+                    logTo(logEl, `${name} phát: ${val}`); 
+                    subject.next(val); 
+                });
+                document.getElementById(addSub2BtnId)?.addEventListener('click', () => {
+                    if(!subject) { logTo(logEl, `Tạo ${name} trước!`, true); return; } 
+                    if(sub2 && !sub2.closed) { logTo(logEl, "Sub2 đã đăng ký rồi."); return; }
+                    logTo(logEl, "Sub2 đăng ký."); 
+                    sub2 = subject.subscribe(val => { 
+                        addMarble(sub2OutEl, val, false, 0, '#e67e22'); 
+                        logTo(logEl, `Sub2 nhận: ${val}`); 
+                    });
+                    manageSub(`${name}_sub2`, sub2);
+                });
+                document.getElementById(resetBtnId)?.addEventListener('click', reset);
+            }
+            setupSubjectDemo('Subject', 'runBasicSubject', 'emitToBasicSubject', 'addBasicSubjectSub2', 'resetBasicSubject', 'basicSubjectLog', 'basicSubjectSub1Output', 'basicSubjectSub2Output', () => new Subject());
+            setupSubjectDemo('BehaviorSubject', 'runBehaviorSubject', 'emitToBehaviorSubject', 'addBehaviorSubjectSub2', 'resetBehaviorSubject', 'behaviorSubjectLog', 'behaviorSubjectSub1Output', 'behaviorSubjectSub2Output', () => new BehaviorSubject('Khánh'));
+            setupSubjectDemo('ReplaySubject', 'runReplaySubject', 'emitToReplaySubject', 'addReplaySubjectSub2', 'resetReplaySubject', 'replaySubjectLog', 'replaySubjectSub1Output', 'replaySubjectSub2Output', () => new ReplaySubject(2));
+
+            // --- Section 8: Real world examples ---
+            const typeaheadLoggerEl = document.getElementById('typeaheadLoggerOutput');
+            const typeaheadInputEl = document.getElementById('typeaheadInput');
+            if (typeaheadInputEl) {
+                const inputStreamEl = document.getElementById('typeaheadInputStream');
+                const resultEl = document.getElementById('typeaheadResult');
+                const fakeApiSearch = (term) => timer(500).pipe(map(() => `Kết quả cho '${term}'`));
+                
+                const sub = fromEvent(typeaheadInputEl, 'input').pipe(
+                    map(event => event.target.value),
+                    tap(term => {
+                        clearStream(inputStreamEl);
+                        addMarble(inputStreamEl, term || 'trống', false);
+                        logTo(typeaheadLoggerEl, `Input: "${term}"`);
+                    }),
+                    debounceTime(400),
+                    distinctUntilChanged(),
+                    tap(term => {
+                        logTo(typeaheadLoggerEl, `Đã qua debounce/distinct. Tìm kiếm: "${term}"`);
+                        resultEl.innerHTML = '';
+                        resultEl.classList.add('skeleton');
+                    }),
+                    switchMap(term => term ? fakeApiSearch(term) : of('Gõ để tìm kiếm')),
+                    finalize(() => resultEl.classList.remove('skeleton'))
+                ).subscribe(result => {
+                    logTo(typeaheadLoggerEl, `API trả về: "${result}"`);
+                    resultEl.classList.remove('skeleton');
+                    if (resultEl) resultEl.textContent = result;
+                });
+                manageSub('typeahead', sub);
+            }
+            
+            const startProgressBarBtn = document.getElementById('startProgressBar');
+            const resetProgressBarBtn = document.getElementById('resetProgressBar');
+            const progressFillEl = document.getElementById('progressFill');
+            const progressStatusEl = document.getElementById('progressStatus');
+            const progressBarLoggerEl = document.getElementById('progressBarLoggerOutput');
+            
+            function resetProgressBar() {
+                cleanupSub('progressBar');
+                if (progressFillEl) progressFillEl.style.width = '0%';
+                if (progressStatusEl) progressStatusEl.textContent = '';
+                if (startProgressBarBtn) startProgressBarBtn.disabled = false;
+                clearStream(progressBarLoggerEl);
+            }
+            if(startProgressBarBtn) {
+                 const startClick$ = fromEvent(startProgressBarBtn, 'click').pipe(shareReplay(1));
+                 const sub = startClick$.pipe(
+                    tap(() => logTo(progressBarLoggerEl, "Bắt đầu tải...")),
+                    exhaustMap(() => {
+                        startProgressBarBtn.disabled = true;
+                        return interval(40).pipe(
+                            take(101),
+                            tap(percentage => {
+                                progressFillEl.style.width = `${percentage}%`;
+                                progressStatusEl.textContent = `Đang tải... ${percentage}%`;
+                            }),
+                            finalize(() => {
+                                startProgressBarBtn.disabled = false;
+                                progressStatusEl.textContent = 'Hoàn thành!';
+                                logTo(progressBarLoggerEl, "--- Tải hoàn thành ---");
+                            })
+                        );
+                    })
+                ).subscribe();
+                manageSub('progressBar', sub);
+            }
+            resetProgressBarBtn?.addEventListener('click', resetProgressBar);
+
+            const validationForm = document.getElementById('validationForm');
+            if (validationForm) {
+                const usernameInput = document.getElementById('usernameInput');
+                const emailInput = document.getElementById('emailInput');
+                const passwordInput = document.getElementById('passwordInput');
+                const submitBtn = document.getElementById('submitFormBtn');
+                const formStatus = document.getElementById('formStatus');
+                const formLoggerEl = document.getElementById('formLoggerOutput');
+                
+                const createValidationStream = (inputEl, validationFn) => fromEvent(inputEl, 'input').pipe(
+                    map(event => event.target.value),
+                    startWith(inputEl.value || ''),
+                    debounceTime(300),
+                    distinctUntilChanged(),
+                    tap(val => logTo(formLoggerEl, `Input ${inputEl.id}: "${val}"`)),
+                    switchMap(validationFn),
+                    tap(res => logTo(formLoggerEl, `Validation ${inputEl.id}: ${res.valid ? 'OK' : 'Lỗi'} - ${res.msg}`)),
+                    shareReplay(1)
+                );
+
+                const isUsernameAvailable = (username) => timer(500).pipe(map(() => !['admin', 'root', 'test'].includes(username.toLowerCase())));
+
+                const username$ = createValidationStream(usernameInput, value => {
+                    if (value.length < 3) return of({ el: usernameInput, valid: false, msg: 'Phải có ít nhất 3 ký tự.' });
+                    logTo(formLoggerEl, `Kiểm tra username "${value}" với API...`);
+                    return isUsernameAvailable(value).pipe(
+                        map(isAvailable => isAvailable 
+                            ? { el: usernameInput, valid: true, msg: 'Tên người dùng hợp lệ.' } 
+                            : { el: usernameInput, valid: false, msg: 'Tên người dùng đã tồn tại.' }
+                        )
+                    );
+                });
+                
+                const email$ = createValidationStream(emailInput, value => {
+                    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+                    return of(value === '' ? { el: emailInput, valid: false, msg: '' } : isValid ? { el: emailInput, valid: true, msg: 'Email hợp lệ.'} : { el: emailInput, valid: false, msg: 'Email không hợp lệ.'});
+                });
+
+                const password$ = createValidationStream(passwordInput, value => {
+                    const isValid = value.length >= 6;
+                    return of(value === '' ? { el: passwordInput, valid: false, msg: '' } : isValid ? { el: passwordInput, valid: true, msg: 'Mật khẩu mạnh.'} : { el: passwordInput, valid: false, msg: 'Mật khẩu phải có ít nhất 6 ký tự.'});
+                });
+
+                const validationSubscriber = (stream$, key) => {
+                    const sub = stream$.subscribe(({el, valid, msg}) => {
+                        const msgEl = document.getElementById(`${el.id}ValidationMsg`);
+                        el.classList.toggle('is-valid', valid);
+                        el.classList.toggle('is-invalid', !valid && msg !== '');
+                        if (msgEl) { msgEl.textContent = msg; msgEl.className = `validation-message ${valid ? 'is-valid' : 'is-invalid'}`; }
+                    });
+                    manageSub(key, sub);
+                };
+
+                validationSubscriber(username$, 'validationUser');
+                validationSubscriber(email$, 'validationEmail');
+                validationSubscriber(password$, 'validationPass');
+                
+                const formValid$ = combineLatest([username$, email$, password$]).pipe(map(([user, email, pass]) => user.valid && email.valid && pass.valid));
+                const formSub = formValid$.subscribe(isValid => {
+                    submitBtn.disabled = !isValid;
+                    formStatus.textContent = isValid ? 'Biểu mẫu hợp lệ!' : 'Vui lòng điền đúng thông tin.';
+                    formStatus.classList.toggle('text-green-600', isValid);
+                    formStatus.classList.toggle('text-red-600', !isValid);
+                    logTo(formLoggerEl, `Trạng thái form hợp lệ: ${isValid}`);
+                });
+                manageSub('formValidation', formSub);
+            }
+
+            // --- Section 9: Hardcore Examples ---
+            const advancedSearchInputEl = document.getElementById('advancedSearchInput');
+            if (advancedSearchInputEl) {
+                const advancedSearchLoggerEl = document.getElementById('advancedSearchLogger');
+                const resultStreamEl = document.getElementById('advancedSearchResultStream');
+                const fakeApiCallAdv = (query) => timer(1000).pipe(map(() => { 
+                    if (query.toLowerCase() === 'error') throw new Error('API cố tình lỗi!'); 
+                    return `Kết quả cho '${query}'`; 
+                }));
+                const sub = fromEvent(advancedSearchInputEl, 'input').pipe(
+                    map(event => event.target.value),
+                    tap(query => { 
+                        clearStream(document.getElementById('advancedSearchOuterStream')); 
+                        addMarble(document.getElementById('advancedSearchOuterStream'), query || "trống", false, 0, '#bdc3c7'); 
+                    }),
+                    debounceTime(500), 
+                    distinctUntilChanged(),
+                    switchMap(query => {
+                        if (!query.trim()) { 
+                            clearStream(resultStreamEl); 
+                            logTo(advancedSearchLoggerEl, 'Input trống, đã clear.');
+                            return EMPTY; 
+                        }
+                        logTo(advancedSearchLoggerEl, `Tìm kiếm: "${query}"`);
+                        return fakeApiCallAdv(query).pipe(
+                            startWith('Đang tải...'), 
+                            catchError(err => {
+                                logTo(advancedSearchLoggerEl, `API Lỗi: ${err.message}`, true);
+                                return of(new Error(`Lỗi: ${err.message}`))
+                            })
+                        );
+                    })
+                ).subscribe(result => {
+                    clearStream(resultStreamEl); 
+                    addMarble(resultStreamEl, result, true, 0); 
+                    logTo(advancedSearchLoggerEl, `Hiển thị: ${result.message || result}`);
+                });
+                manageSub('advancedSearch', sub);
+            }
+            
+            const draggableBoxEl = document.getElementById('draggableBox');
+            if(draggableBoxEl) {
+                const dropZoneEl = document.getElementById('dropZone');
+                const dragDropLoggerEl = document.getElementById('dragDropLogger');
+                function resetDragDrop() {
+                    cleanupSub('dragdrop');
+                    clearStream(dragDropLoggerEl);
+                    draggableBoxEl.style.transform = 'translate(0px, 0px)';
+                    draggableBoxEl.style.left = '20px';
+                    draggableBoxEl.style.top = '20px';
+                    dropZoneEl.textContent = 'Thả vào đây!';
+                    dropZoneEl.classList.remove('over');
+                    logTo(dragDropLoggerEl, 'Đã reset vị trí.');
+                }
+                document.getElementById('resetDragDrop')?.addEventListener('click', resetDragDrop);
+
+                const mouseDown$ = fromEvent(draggableBoxEl, 'mousedown');
+                const mouseMove$ = fromEvent(document, 'mousemove');
+                const mouseUp$ = fromEvent(document, 'mouseup');
+                
+                const sub = mouseDown$.pipe(
+                    tap(e => e.preventDefault()),
+                    exhaustMap(downEvent => {
+                        draggableBoxEl.classList.add('dragging');
+                        logTo(dragDropLoggerEl, 'Bắt đầu kéo...');
+                        const startX = draggableBoxEl.offsetLeft;
+                        const startY = draggableBoxEl.offsetTop;
+                        
+                        return mouseMove$.pipe(
+                            map(moveEvent => ({
+                                x: startX + (moveEvent.clientX - downEvent.clientX),
+                                y: startY + (moveEvent.clientY - downEvent.clientY)
+                            })),
+                            takeUntil(mouseUp$.pipe(tap(() => {
+                                draggableBoxEl.classList.remove('dragging');
+                                const rB = draggableBoxEl.getBoundingClientRect();
+                                const rZ = dropZoneEl.getBoundingClientRect();
+                                const isOver = !(rB.right < rZ.left || rB.left > rZ.right || rB.bottom < rZ.top || rB.top > rZ.bottom);
+                                if(isOver) { 
+                                    logTo(dragDropLoggerEl, 'Thả thành công!');
+                                    dropZoneEl.classList.add('over');
+                                    createConfetti(); 
+                                    setTimeout(() => dropZoneEl.classList.remove('over'), 1500);
+                                } else {
+                                    logTo(dragDropLoggerEl, 'Kết thúc kéo (ngoài vùng).');
+                                }
+                            })))
+                        );
+                    })
+                ).subscribe(pos => {
+                    draggableBoxEl.style.left = `${pos.x}px`;
+                    draggableBoxEl.style.top = `${pos.y}px`;
+                });
+                manageSub('dragdrop', sub);
+            }
+            
+            const startPollingBtn = document.getElementById('startPollingBtn');
+            if (startPollingBtn) {
+                const stopPollingBtn = document.getElementById('stopPollingBtn');
+                const pollingStatusEl = document.getElementById('pollingStatus');
+                const pollingDataStreamEl = document.getElementById('pollingDataStream');
+                const pollingLoggerEl = document.getElementById('pollingLogger');
+                
+                const start$ = fromEvent(startPollingBtn, 'click');
+                const stop$ = fromEvent(stopPollingBtn, 'click');
+                const fetchData = () => timer(500).pipe(map(() => `Data ${new Date().toLocaleTimeString()}`));
+                
+                const sub = start$.pipe(
+                    tap(() => {
+                        startPollingBtn.disabled = true;
+                        stopPollingBtn.disabled = false;
+                        pollingStatusEl.textContent = "Trạng thái: Đang chạy...";
+                        logTo(pollingLoggerEl, "--- Bắt đầu Poll ---");
+                        clearStream(pollingDataStreamEl);
+                    }),
+                    switchMap(() => timer(0, 3000).pipe(
+                        tap(() => logTo(pollingLoggerEl, 'Đang lấy dữ liệu...')),
+                        switchMap(fetchData),
+                        takeUntil(stop$.pipe(tap(() => { 
+                            startPollingBtn.disabled = false;
+                            stopPollingBtn.disabled = true;
+                            pollingStatusEl.textContent = "Trạng thái: Đã dừng"; 
+                            logTo(pollingLoggerEl, "--- Dừng Poll ---");
+                        })))
+                    ))
+                ).subscribe(data => { 
+                    addMarble(pollingDataStreamEl, data, true, 0, '#27ae60'); 
+                    logTo(pollingLoggerEl, `Nhận: ${data}`);
+                });
+                manageSub('polling', sub);
+            }
+            
+            // --- 10.1 Multi-API Search ---
+            const multiApiSearchInputEl = document.getElementById('multiApiSearchInput');
+            if (multiApiSearchInputEl) {
+                const multiApiLoggerEl = document.getElementById('multiApiSearchLogger');
+                const fakeApiMulti1 = (q) => timer(600).pipe(map(() => [`API1:${q}-A`, `API1:${q}-B`]), tap(() => logTo(multiApiLoggerEl, 'API 1 hoàn thành.')));
+                const fakeApiMulti2 = (q) => timer(1000).pipe(map(() => [`API2:${q}-X`, `API2:${q}-Y`]), tap(() => logTo(multiApiLoggerEl, 'API 2 hoàn thành.')));
+                
+                const sub = fromEvent(multiApiSearchInputEl, 'input').pipe(
+                    map(event => event.target.value),
+                    tap(q => {
+                        clearStream(document.getElementById('multiApiSearchOuterStream'));
+                        addMarble(document.getElementById('multiApiSearchOuterStream'), q || "trống", false);
+                    }),
+                    debounceTime(700),
+                    distinctUntilChanged(),
+                    filter(q => q.length > 1),
+                    tap((q) => {
+                        logTo(multiApiLoggerEl, `Bắt đầu tìm kiếm cho "${q}" từ 2 API...`);
+                        clearStream(document.getElementById('multiApi1ResultStream'), document.getElementById('multiApi2ResultStream'), document.getElementById('multiApiCombinedResultStream'));
+                        addMarble(document.getElementById('multiApiCombinedResultStream'), 'Đang tải...', false, 0, null, 'loading');
+                    }),
+                    switchMap(q => forkJoin([
+                        fakeApiMulti1(q).pipe(tap(res => { clearStream(document.getElementById('multiApi1ResultStream')); res.forEach(r => addMarble(document.getElementById('multiApi1ResultStream'), r, false, 0, null, 'api1')); })),
+                        fakeApiMulti2(q).pipe(tap(res => { clearStream(document.getElementById('multiApi2ResultStream')); res.forEach(r => addMarble(document.getElementById('multiApi2ResultStream'), r, false, 0, null, 'api2')); }))
+                    ]).pipe(
+                        map(res => res.flat()), 
+                        catchError(() => { logTo(multiApiLoggerEl, 'Lỗi API!', true); return of(['Lỗi API']); })
+                    ))
+                ).subscribe(results => {
+                    logTo(multiApiLoggerEl, `Kết quả gộp: [${results.join(', ')}]`);
+                    clearStream(document.getElementById('multiApiCombinedResultStream'));
+                    results.forEach(r => addMarble(document.getElementById('multiApiCombinedResultStream'), r, true, 0));
+                });
+                manageSub('multiApi', sub);
+            }
+
+            // --- 10.2 Sequential Tasks ---
+            const startSequentialTasksBtn = document.getElementById('startSequentialTasksBtn');
+            const sequentialTasksLoggerEl = document.getElementById('sequentialTasksLogger');
+            function resetSequentialTasks() {
+                cleanupSub('sequential');
+                if(startSequentialTasksBtn) startSequentialTasksBtn.disabled = false;
+                clearStream(document.getElementById('sequentialTasksProgressStream'), sequentialTasksLoggerEl);
+            }
+            document.getElementById('startSequentialTasksBtn')?.addEventListener('click', () => {
+                resetSequentialTasks();
+                if(startSequentialTasksBtn) startSequentialTasksBtn.disabled = true;
+                logTo(sequentialTasksLoggerEl, '--- Bắt đầu chuỗi tác vụ ---');
+                let task2Attempt = 0;
+                
+                const task1$ = of('1. Xác thực').pipe(delay(800), tap(msg => { addMarble(document.getElementById('sequentialTasksProgressStream'), `✅ User`, true, 0, '#2ecc71'); logTo(sequentialTasksLoggerEl, msg); }));
+                const task2$ = defer(() => {
+                    task2Attempt++;
+                    logTo(sequentialTasksLoggerEl, `Thử gọi API lần #${task2Attempt}...`);
+                    addMarble(document.getElementById('sequentialTasksProgressStream'), `API #${task2Attempt}`, false, 0, '#f1c40f');
+                    if (task2Attempt <= 1) return timer(1000).pipe(mergeMap(() => throwError(() => new Error('Mạng yếu'))));
+                    return timer(1000).pipe(map(() => '2. Lấy dữ liệu OK'));
+                }).pipe(
+                    retry(1), 
+                    tap(msg => { addMarble(document.getElementById('sequentialTasksProgressStream'), `✅ Data`, true, 0, '#2ecc71'); logTo(sequentialTasksLoggerEl, msg); }), 
+                    catchError((err) => {
+                        addMarble(document.getElementById('sequentialTasksProgressStream'), '❌ Data', true, 0, null, 'error');
+                        logTo(sequentialTasksLoggerEl, `Lỗi API: ${err.message}`, true);
+                        return of('Lỗi');
+                    })
+                );
+                const task3$ = of('3. Hiển thị').pipe(delay(600), tap(msg => { addMarble(document.getElementById('sequentialTasksProgressStream'), `✅ UI`, true, 0, '#2ecc71'); logTo(sequentialTasksLoggerEl, msg); }));
+
+                const sub = concat(task1$, task2$, task3$).pipe(
+                    finalize(() => {
+                        addCompletionMarble(document.getElementById('sequentialTasksProgressStream'), 100);
+                        if(startSequentialTasksBtn) startSequentialTasksBtn.disabled = false;
+                        logTo(sequentialTasksLoggerEl, '--- Chuỗi tác vụ hoàn thành ---');
+                    })
+                ).subscribe();
+                manageSub('sequential', sub);
+            });
+            document.getElementById('resetSequentialTasksBtn')?.addEventListener('click', resetSequentialTasks);
+
+            // --- 10.3 Infinite Scroll ---
+            const infiniteScrollContainerEl = document.getElementById('infiniteScrollContainer');
+            const infiniteScrollLoggerEl = document.getElementById('infiniteScrollLogger');
+            let infiniteScrollPage = 0;
+            let infiniteScrollLoading = false;
+            
+            function fetchItemsForScroll(pageNum) {
+                infiniteScrollLoading = true;
+                logTo(infiniteScrollLoggerEl, `Đang tải trang ${pageNum}...`);
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'loading-more';
+                loadingDiv.textContent = 'Đang tải thêm...';
+                infiniteScrollContainerEl.appendChild(loadingDiv);
+                
+                return timer(1000).pipe(
+                    map(() => Array.from({length: 7}, (_, i) => `Item ${pageNum * 7 + i + 1}`)),
+                    finalize(() => { 
+                        infiniteScrollLoading = false; 
+                        const el = infiniteScrollContainerEl.querySelector('.loading-more');
+                        if (el) el.remove();
+                        logTo(infiniteScrollLoggerEl, `Tải xong trang ${pageNum}.`);
+                    })
+                );
+            }
+
+            function loadInitialScrollItems() {
+                const sub = fetchItemsForScroll(infiniteScrollPage).subscribe(items => {
+                    items.forEach(itemText => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'item';
+                        itemDiv.textContent = itemText;
+                        infiniteScrollContainerEl.appendChild(itemDiv);
+                    });
+                });
+                manageSub('infiniteScrollInitial', sub);
+            }
+            
+            function resetInfiniteScroll() {
+                cleanupSub('infiniteScroll');
+                cleanupSub('infiniteScrollInitial');
+                infiniteScrollPage = 0;
+                infiniteScrollLoading = false;
+                clearStream(infiniteScrollContainerEl, infiniteScrollLoggerEl);
+                loadInitialScrollItems();
+            }
+            document.getElementById('resetInfiniteScrollBtn')?.addEventListener('click', resetInfiniteScroll);
+            
+            if (infiniteScrollContainerEl) {
+                loadInitialScrollItems();
+                const sub = fromEvent(infiniteScrollContainerEl, 'scroll').pipe(
+                    filter(() => !infiniteScrollLoading && (infiniteScrollContainerEl.scrollTop + infiniteScrollContainerEl.clientHeight >= infiniteScrollContainerEl.scrollHeight - 100)),
+                    debounceTime(200),
+                    exhaustMap(() => {
+                        infiniteScrollPage++;
+                        return fetchItemsForScroll(infiniteScrollPage);
+                    })
+                ).subscribe(newItems => {
+                    newItems.forEach(itemText => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'item';
+                        itemDiv.textContent = itemText;
+                        infiniteScrollContainerEl.appendChild(itemDiv);
+                    });
+                });
+                manageSub('infiniteScroll', sub);
+            }
+
+            // --- Section 11: Advanced Applications ---
+            const autosaveTextarea = document.getElementById('autosaveTextarea');
+            if(autosaveTextarea) {
+                const autosaveStatusEl = document.getElementById('autosaveStatus');
+                const autosaveLoggerEl = document.getElementById('autosaveLogger');
+                const fakeSaveApi = (content) => timer(1500).pipe(map(() => `Đã lưu: "${content.substring(0, 30)}..."`));
+
+                const sub = fromEvent(autosaveTextarea, 'input').pipe(
+                    map(event => event.target.value),
+                    tap(() => { autosaveStatusEl.textContent = 'Đang gõ...'; autosaveStatusEl.className = 'text-right text-sm italic text-blue-500 mb-2 h-5'; }),
+                    debounceTime(1500),
+                    distinctUntilChanged(),
+                    filter(content => content.trim().length > 0),
+                    tap(() => { autosaveStatusEl.textContent = 'Đang lưu...'; autosaveStatusEl.className = 'text-right text-sm italic text-yellow-500 mb-2 h-5 animate-pulse'; }),
+                    switchMap(content => fakeSaveApi(content).pipe(
+                        catchError(() => {
+                            autosaveStatusEl.textContent = 'Lưu thất bại!';
+                            autosaveStatusEl.className = 'text-right text-sm italic text-red-500 mb-2 h-5';
+                            return EMPTY;
+                        })
+                    ))
+                ).subscribe(result => {
+                    autosaveStatusEl.textContent = 'Đã lưu!';
+                    autosaveStatusEl.className = 'text-right text-sm italic text-green-500 mb-2 h-5';
+                    logTo(autosaveLoggerEl, result);
+                });
+                manageSub('autosave', sub);
+            }
+
+            const wsConnectBtn = document.getElementById('wsConnectBtn');
+            if (wsConnectBtn) {
+                const wsDisconnectBtn = document.getElementById('wsDisconnectBtn');
+                const wsSendBtn = document.getElementById('wsSendBtn');
+                const wsMessageInput = document.getElementById('wsMessageInput');
+                const wsStatusEl = document.getElementById('wsStatus');
+                const wsLoggerEl = document.getElementById('wsLogger');
+
+                const WS_URL = 'wss://socketsbay.com/wss/v2/1/demo/';
+                let wsSubject;
+
+                const updateWsUi = (state) => {
+                    if (state === 'connected') {
+                        wsStatusEl.textContent = 'Đã kết nối';
+                        wsStatusEl.className = 'my-2 p-2 rounded-lg text-center font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+                        wsConnectBtn.disabled = true;
+                        wsDisconnectBtn.disabled = false;
+                        wsMessageInput.disabled = false;
+                        wsSendBtn.disabled = false;
+                    } else if (state === 'connecting') {
+                        wsStatusEl.textContent = 'Đang kết nối...';
+                        wsStatusEl.className = 'my-2 p-2 rounded-lg text-center font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 animate-pulse';
+                    } else { // disconnected
+                         wsStatusEl.textContent = 'Đã ngắt kết nối';
+                         wsStatusEl.className = 'my-2 p-2 rounded-lg text-center font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+                         wsConnectBtn.disabled = false;
+                         wsDisconnectBtn.disabled = true;
+                         wsMessageInput.disabled = true;
+                         wsSendBtn.disabled = true;
+                    }
+                };
+
+                function connect() {
+                    logTo(wsLoggerEl, `Đang kết nối đến ${WS_URL}...`);
+                    updateWsUi('connecting');
+                    
+                    wsSubject = webSocket({
+                        url: WS_URL,
+                        openObserver: { next: () => {
+                            logTo(wsLoggerEl, 'Kết nối thành công!');
+                            updateWsUi('connected');
+                        }},
+                        closeObserver: { next: (e) => {
+                            logTo(wsLoggerEl, `Đã ngắt kết nối. Reason: ${e.reason || 'Unknown'}`, true);
+                            updateWsUi('disconnected');
+                            cleanupSub('websocket');
+                        }}
+                    });
+
+                    const sub = wsSubject.pipe(
+                        retry({ count: 5, delay: (err, retryCount) => {
+                            logTo(wsLoggerEl, `Mất kết nối. Thử lại lần ${retryCount} sau 2s...`, true);
+                            updateWsUi('connecting');
+                            return timer(2000);
+                        }})
+                    ).subscribe({
+                        next: msg => logTo(wsLoggerEl, `Nhận: ${JSON.stringify(msg)}`),
+                        error: err => { 
+                            logTo(wsLoggerEl, `Lỗi không thể phục hồi: ${err.type || 'Unknown'}`, true);
+                            updateWsUi('disconnected');
+                        }
+                    });
+                    manageSub('websocket', sub);
+                }
+                
+                wsConnectBtn.addEventListener('click', connect);
+                wsDisconnectBtn.addEventListener('click', () => { if (wsSubject) wsSubject.complete(); });
+                wsSendBtn.addEventListener('click', () => {
+                    const msg = wsMessageInput.value;
+                    if (msg && wsSubject) {
+                        logTo(wsLoggerEl, `Gửi: ${msg}`);
+                        wsSubject.next({ message: msg });
+                        wsMessageInput.value = '';
+                    }
+                });
+                updateWsUi('disconnected');
+            }
+            
+            // --- Initialize first section ---
+            document.querySelector('.nav-button[data-section="intro"]')?.click();
+        });
+    </script>
+</body>
+</html>
